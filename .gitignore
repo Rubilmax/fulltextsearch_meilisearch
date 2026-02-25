@@ -3,8 +3,3 @@
 \.idea/
 /build/
 /vendor/
-/lib/VendorPsr/
-/es8/vendor/
-/es8/lib/Vendor8/
-/es8/lib/Vendor8Psr/
-/es8/build/

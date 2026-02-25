@@ -4,13 +4,13 @@
  */
 
 /** global: OC */
-/** global: elasticsearch_elements */
+/** global: meilisearch_elements */
 /** global: fts_admin_settings */
 
 
 
 
-var elasticsearch_settings = {
+var meilisearch_settings = {
 
 	config: null,
 
@@ -18,41 +18,42 @@ var elasticsearch_settings = {
 
 		$.ajax({
 			method: 'GET',
-			url: OC.generateUrl('/apps/fulltextsearch_elasticsearch/admin/settings')
+			url: OC.generateUrl('/apps/fulltextsearch_meilisearch/admin/settings')
 		}).done(function (res) {
-			elasticsearch_settings.updateSettingPage(res);
+			meilisearch_settings.updateSettingPage(res);
 		});
 
 	},
 
-	/** @namespace result.elastic_host */
-	/** @namespace result.elastic_index */
+	/** @namespace result.meilisearch_host */
+	/** @namespace result.meilisearch_index */
+	/** @namespace result.meilisearch_api_key */
 	updateSettingPage: function (result) {
 
-		elasticsearch_elements.elasticsearch_host.val(result.elastic_host);
-		elasticsearch_elements.elasticsearch_index.val(result.elastic_index);
-		elasticsearch_elements.analyzer_tokenizer.val(result.analyzer_tokenizer);
+		meilisearch_elements.meilisearch_host.val(result.meilisearch_host);
+		meilisearch_elements.meilisearch_index.val(result.meilisearch_index);
+		meilisearch_elements.meilisearch_api_key.val(result.meilisearch_api_key);
 
-		fts_admin_settings.tagSettingsAsSaved(elasticsearch_elements.elasticsearch_div);
+		fts_admin_settings.tagSettingsAsSaved(meilisearch_elements.meilisearch_div);
 	},
 
 
 	saveSettings: function () {
 
 		var data = {
-			elastic_host: elasticsearch_elements.elasticsearch_host.val(),
-			elastic_index: elasticsearch_elements.elasticsearch_index.val(),
-			analyzer_tokenizer: elasticsearch_elements.analyzer_tokenizer.val()
+			meilisearch_host: meilisearch_elements.meilisearch_host.val(),
+			meilisearch_index: meilisearch_elements.meilisearch_index.val(),
+			meilisearch_api_key: meilisearch_elements.meilisearch_api_key.val()
 		};
 
 		$.ajax({
 			method: 'POST',
-			url: OC.generateUrl('/apps/fulltextsearch_elasticsearch/admin/settings'),
+			url: OC.generateUrl('/apps/fulltextsearch_meilisearch/admin/settings'),
 			data: {
 				data: data
 			}
 		}).done(function (res) {
-			elasticsearch_settings.updateSettingPage(res);
+			meilisearch_settings.updateSettingPage(res);
 		});
 
 	}

@@ -7,7 +7,7 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\FullTextSearch_Elasticsearch\Exceptions;
+namespace OCA\FullTextSearch_Meilisearch\Exceptions;
 
 use Exception;
 

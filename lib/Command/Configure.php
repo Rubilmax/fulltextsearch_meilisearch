@@ -7,12 +7,11 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\FullTextSearch_Elasticsearch\Command;
+namespace OCA\FullTextSearch_Meilisearch\Command;
 
 use Exception;
 use OC\Core\Command\Base;
-use OCA\CloudFederationAPI\Config;
-use OCA\FullTextSearch_Elasticsearch\Service\ConfigService;
+use OCA\FullTextSearch_Meilisearch\Service\ConfigService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -27,7 +26,7 @@ class Configure extends Base {
 
 	protected function configure() {
 		parent::configure();
-		$this->setName('fulltextsearch_elasticsearch:configure')
+		$this->setName('fulltextsearch_meilisearch:configure')
 			 ->addArgument('json', InputArgument::OPTIONAL, 'set config')
 			 ->setDescription('Configure the installation');
 	}
