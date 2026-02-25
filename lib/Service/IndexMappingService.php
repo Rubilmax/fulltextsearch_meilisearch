@@ -7,130 +7,131 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\FullTextSearch_Elasticsearch\Service;
+namespace OCA\FullTextSearch_Meilisearch\Service;
 
-use OCA\FullTextSearch_Elasticsearch\ConfigLexicon;
-use OCA\FullTextSearch_Elasticsearch\Exceptions\AccessIsEmptyException;
-use OCA\FullTextSearch_Elasticsearch\Exceptions\ConfigurationException;
-use OCA\FullTextSearch_Elasticsearch\Vendor\Elastic\Elasticsearch\Client;
-use OCA\FullTextSearch_Elasticsearch\Vendor\Elastic\Elasticsearch\Exception\ClientResponseException;
-use OCA\FullTextSearch_Elasticsearch\Vendor\Elastic\Elasticsearch\Exception\MissingParameterException;
-use OCA\FullTextSearch_Elasticsearch\Vendor\Elastic\Elasticsearch\Exception\ServerResponseException;
-use OCA\FullTextSearch_Elasticsearch\Vendor8\Elastic\Elasticsearch\Client as Client8;
-use OCA\FullTextSearch_Elasticsearch\Vendor8\Elastic\Elasticsearch\Exception\ClientResponseException as ClientResponseException8;
-use OCA\FullTextSearch_Elasticsearch\Vendor8\Elastic\Elasticsearch\Exception\MissingParameterException as MissingParameterException8;
-use OCA\FullTextSearch_Elasticsearch\Vendor8\Elastic\Elasticsearch\Exception\ServerResponseException as ServerResponseException8;
-use OCP\AppFramework\Services\IAppConfig;
+use Meilisearch\Client;
+use Meilisearch\Exceptions\ApiException;
+use OCA\FullTextSearch_Meilisearch\Exceptions\AccessIsEmptyException;
+use OCA\FullTextSearch_Meilisearch\Exceptions\ConfigurationException;
 use OCP\FullTextSearch\Model\IIndexDocument;
 
 
-/**
- * Class IndexMappingService
- *
- * @package OCA\FullTextSearch_Elasticsearch\Service
- */
 class IndexMappingService {
 
 	public function __construct(
 		private ConfigService $configService,
-		private readonly IAppConfig $appConfig,
 	) {
 	}
 
 
 	/**
-	 * @param Client|Client8 $client
+	 * Encode a providerId:documentId pair into a Meilisearch-safe document ID.
+	 * Meilisearch requires alphanumeric IDs (plus - and _).
+	 */
+	public static function encodeDocumentId(string $providerId, string $documentId): string {
+		return str_replace(':', '_-_', $providerId . ':' . $documentId);
+	}
+
+
+	/**
+	 * Decode a Meilisearch document ID back to [providerId, documentId].
+	 */
+	public static function decodeDocumentId(string $encodedId): array {
+		$decoded = str_replace('_-_', ':', $encodedId);
+		return explode(':', $decoded, 2);
+	}
+
+
+	/**
+	 * @return string
+	 * @throws ConfigurationException
+	 */
+	public function getIndexName(): string {
+		return $this->configService->getMeilisearchIndex();
+	}
+
+
+	/**
+	 * Configure Meilisearch index settings (filterable, searchable, sortable attributes).
+	 *
+	 * @param Client $client
+	 * @throws ConfigurationException
+	 */
+	public function configureIndexSettings(Client $client): void {
+		$index = $client->index($this->configService->getMeilisearchIndex());
+
+		$index->updateFilterableAttributes([
+			'owner', 'users', 'groups', 'circles', 'links',
+			'provider', 'metatags', 'subtags', 'tags', 'source',
+			'lastModified',
+		]);
+
+		$index->updateSearchableAttributes([
+			'title', 'content',
+		]);
+
+		$index->updateSortableAttributes([
+			'lastModified',
+		]);
+
+		$index->updateDisplayedAttributes(['*']);
+	}
+
+
+	/**
+	 * @param Client $client
 	 * @param IIndexDocument $document
 	 *
 	 * @return array
 	 * @throws AccessIsEmptyException
 	 * @throws ConfigurationException
-	 * @throws ClientResponseException|ClientResponseException8
-	 * @throws MissingParameterException|MissingParameterException8
-	 * @throws ServerResponseException|ServerResponseException8
 	 */
-	public function indexDocumentNew(Client|Client8 $client, IIndexDocument $document): array {
-		$index = [
-			'index' =>
-				[
-					'index' => $this->configService->getElasticIndex(),
-					'id' => $document->getProviderId() . ':' . $document->getId(),
-					'body' => $this->generateIndexBody($document)
-				]
-		];
+	public function indexDocumentNew(Client $client, IIndexDocument $document): array {
+		$index = $client->index($this->configService->getMeilisearchIndex());
 
-		$this->onIndexingDocument($document, $index);
-		$result = $client->index($index['index']);
+		$body = $this->generateIndexBody($document);
+		$body['id'] = self::encodeDocumentId($document->getProviderId(), $document->getId());
 
-		return $result->asArray();
+		$result = $index->addDocuments([$body]);
+
+		return (array)$result;
 	}
 
 
 	/**
-	 * @param Client|Client8 $client
+	 * @param Client $client
 	 * @param IIndexDocument $document
 	 *
 	 * @return array
 	 * @throws AccessIsEmptyException
-	 * @throws ClientResponseException|ClientResponseException8
 	 * @throws ConfigurationException
-	 * @throws MissingParameterException|MissingParameterException8
-	 * @throws ServerResponseException|ServerResponseException8
 	 */
-	public function indexDocumentUpdate(Client|Client8 $client, IIndexDocument $document): array {
-		$index = [
-			'index' =>
-				[
-					'index' => $this->configService->getElasticIndex(),
-					'id' => $document->getProviderId() . ':' . $document->getId(),
-					'body' => ['doc' => $this->generateIndexBody($document)]
-				]
-		];
+	public function indexDocumentUpdate(Client $client, IIndexDocument $document): array {
+		$index = $client->index($this->configService->getMeilisearchIndex());
 
-		$this->onIndexingDocument($document, $index);
-		try {
-			$result = $client->update($index['index']);
+		$body = $this->generateIndexBody($document);
+		$body['id'] = self::encodeDocumentId($document->getProviderId(), $document->getId());
 
-			return $result->asArray();
-		} catch (ClientResponseException|ClientResponseException8 $e) {
-			return $this->indexDocumentNew($client, $document);
-		}
+		$result = $index->updateDocuments([$body]);
+
+		return (array)$result;
 	}
 
 
 	/**
-	 * @param Client|Client8 $client
+	 * @param Client $client
 	 * @param string $providerId
 	 * @param string $documentId
 	 *
 	 * @throws ConfigurationException
-	 * @throws MissingParameterException|MissingParameterException8
-	 * @throws ServerResponseException|ServerResponseException8
 	 */
-	public function indexDocumentRemove(Client|Client8 $client, string $providerId, string $documentId): void {
-		$index = [
-			'index' =>
-				[
-					'index' => $this->configService->getElasticIndex(),
-					'id' => $providerId . ':' . $documentId,
-				]
-		];
+	public function indexDocumentRemove(Client $client, string $providerId, string $documentId): void {
+		$index = $client->index($this->configService->getMeilisearchIndex());
+		$docId = self::encodeDocumentId($providerId, $documentId);
 
 		try {
-			$client->delete($index['index']);
-		} catch (ClientResponseException|ClientResponseException8 $e) {
-		}
-	}
-
-
-	/**
-	 * @param IIndexDocument $document
-	 * @param array $arr
-	 */
-	public function onIndexingDocument(IIndexDocument $document, array &$arr): void {
-		if ($document->getContent() !== ''
-			&& $document->isContentEncoded() === IIndexDocument::ENCODED_BASE64) {
-			$arr['index']['pipeline'] = 'attachment';
+			$index->deleteDocument($docId);
+		} catch (ApiException) {
 		}
 	}
 
@@ -144,12 +145,6 @@ class IndexMappingService {
 	public function generateIndexBody(IIndexDocument $document): array {
 		$access = $document->getAccess();
 
-		// TODO: check if we can just update META or just update CONTENT.
-//		$index = $document->getIndex();
-//		$body = [];
-
-		// TODO: isStatus ALL or META (uncomment condition)
-//		if ($index->isStatus(IIndex::INDEX_META)) {
 		$body = [
 			'owner' => $access->getOwnerId(),
 			'users' => $access->getUsers(),
@@ -165,203 +160,17 @@ class IndexMappingService {
 			'source' => $document->getSource(),
 			'title' => $document->getTitle(),
 			'parts' => $document->getParts(),
-			'combined' => ''
 		];
-//		}
 
-		// TODO: isStatus ALL or CONTENT (uncomment condition)
-//		if ($index->isStatus(IIndex::INDEX_CONTENT)) {
-			$body['content'] = $document->getContent();
-//		}
+		$content = $document->getContent();
+		if ($content !== '' && $document->isContentEncoded() === IIndexDocument::ENCODED_BASE64) {
+			$decoded = base64_decode($content);
+			$content = ($decoded !== false && mb_check_encoding($decoded, 'UTF-8'))
+				? $decoded
+				: '';
+		}
+		$body['content'] = $content;
+
 		return array_merge($document->getInfoAll(), $body);
 	}
-
-
-	/**
-	 * @param bool $complete
-	 *
-	 * @return array
-	 * @throws ConfigurationException
-	 */
-	public function generateGlobalMap(bool $complete = true): array {
-		$params = [
-			'index' => $this->configService->getElasticIndex()
-		];
-
-		if ($complete === false) {
-			return $params;
-		}
-
-		$params['body'] = [
-			'settings' => [
-				'index.mapping.total_fields.limit' => $this->appConfig->getAppValueInt(ConfigLexicon::FIELDS_LIMIT),
-				'analysis' => [
-					'filter' => [
-						'shingle' => [
-							'type' => 'shingle'
-						]
-					],
-					'char_filter' => [
-						'pre_negs' => [
-							'type' => 'pattern_replace',
-							'pattern' => '(\\w+)\\s+((?i:never|no|nothing|nowhere|noone|none|not|havent|hasnt|hadnt|cant|couldnt|shouldnt|wont|wouldnt|dont|doesnt|didnt|isnt|arent|aint))\\b',
-							'replacement' => '~$1 $2'
-						],
-						'post_negs' => [
-							'type' => 'pattern_replace',
-							'pattern' => '\\b((?i:never|no|nothing|nowhere|noone|none|not|havent|hasnt|hadnt|cant|couldnt|shouldnt|wont|wouldnt|dont|doesnt|didnt|isnt|arent|aint))\\s+(\\w+)',
-							'replacement' => '$1 ~$2'
-						]
-					],
-					'analyzer' => [
-						'analyzer' => [
-							'type' => 'custom',
-							'tokenizer' => $this->appConfig->getAppValueString(ConfigLexicon::ANALYZER_TOKENIZER),
-							'filter' => ['lowercase', 'stop', 'kstem']
-						]
-					]
-				]
-			],
-			'mappings' => [
-                'dynamic' => true,
-                'properties' => [
-                    'source' => [
-                        'type' => 'keyword'
-                    ],
-                    'title' => [
-                        'type' => 'text',
-                        'analyzer' => 'keyword',
-                        'term_vector' => 'with_positions_offsets',
-                        'copy_to' => 'combined'
-                    ],
-                    'provider' => [
-                        'type' => 'keyword'
-                    ],
-                    'lastModified' => [
-                        'type' => 'integer',
-                    ],
-                    'tags' => [
-                        'type' => 'keyword'
-                    ],
-                    'metatags' => [
-                        'type' => 'keyword'
-                    ],
-                    'subtags' => [
-                        'type' => 'keyword'
-                    ],
-                    'content' => [
-                        'type' => 'text',
-                        'analyzer' => 'analyzer',
-                        'term_vector' => 'with_positions_offsets',
-                        'copy_to' => 'combined'
-                    ],
-                    'owner' => [
-                        'fields' => [
-                            'keyword' => [
-                                'type' => 'keyword'
-                            ]
-                        ],
-                        'type' => 'keyword'
-                    ],
-                    'users' => [
-                        'fields' => [
-                            'keyword' => [
-                                'type' => 'keyword'
-                            ]
-                        ],
-                        'type' => 'keyword'
-                    ],
-                    'groups' => [
-                        'fields' => [
-                            'keyword' => [
-                                'type' => 'keyword'
-                            ]
-                        ],
-                        'type' => 'keyword'
-                    ],
-                    'circles' => [
-                        'fields' => [
-                            'keyword' => [
-                                'type' => 'keyword'
-                            ]
-                        ],
-                        'type' => 'keyword'
-                    ],
-                    'links' => [
-                        'type' => 'keyword'
-                    ],
-                    'hash' => [
-                        'type' => 'keyword'
-                    ],
-                    'combined' => [
-                        'type' => 'text',
-                        'analyzer' => 'analyzer',
-                        'term_vector' => 'with_positions_offsets'
-                    ]
-                ]
-			]
-		];
-
-		return $params;
-	}
-
-
-	/**
-	 * @param bool $complete
-	 *
-	 * @return array
-	 */
-	public function generateGlobalIngest(bool $complete = true): array {
-		$params = ['id' => 'attachment'];
-
-		if ($complete === false) {
-			return $params;
-		}
-
-		$params['body'] = [
-			'description' => 'attachment',
-            'processors' => [
-                [
-                    'attachment' => [
-                        'remove_binary' => true,
-                        'field' => 'content',
-                        'indexed_chars' => -1
-                    ]
-                ],
-                [
-                    'convert' => [
-                        'field' => 'attachment.content',
-                        'type' => 'string',
-                        'target_field' => 'content',
-                        'ignore_failure' => true
-                    ]
-                ], [
-                    'remove' => [
-                        'field' => 'attachment.content',
-                        'ignore_failure' => true
-                    ]
-                ]
-			]
-		];
-
-		return $params;
-	}
-
-
-	/**
-	 * @param string $providerId
-	 *
-	 * @return array
-	 * @throws ConfigurationException
-	 */
-	public function generateDeleteQuery(string $providerId): array {
-		$params = [
-			'index' => $this->configService->getElasticIndex()
-		];
-
-		$params['body']['query']['match'] = ['provider' => $providerId];
-
-		return $params;
-	}
 }
-

@@ -5,41 +5,41 @@
 -->
 <info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
-	<id>fulltextsearch_elasticsearch</id>
-	<name>Full text search - Elasticsearch Platform</name>
-	<summary>Index using ElasticSearch</summary>
+	<id>fulltextsearch_meilisearch</id>
+	<name>Full text search - Meilisearch Platform</name>
+	<summary>Index using Meilisearch</summary>
 	<description><![CDATA[
 
-Extension to the _Full text search_ app to communicate with ElasticSearch.
+Extension to the _Full text search_ app to communicate with Meilisearch.
 
 ]]>
 	</description>
 	<version>32.0.0</version>
 	<licence>agpl</licence>
 	<author>Maxence Lange</author>
-	<namespace>FullTextSearch_Elasticsearch</namespace>
+	<namespace>FullTextSearch_Meilisearch</namespace>
 	<documentation>
-		<admin>https://github.com/nextcloud/fulltextsearch_elasticsearch/wiki</admin>
+		<admin>https://github.com/nextcloud/fulltextsearch_meilisearch/wiki</admin>
 	</documentation>
 	<category>search</category>
-	<website>https://github.com/nextcloud/fulltextsearch_elasticsearch</website>
-	<bugs>https://github.com/nextcloud/fulltextsearch_elasticsearch/issues</bugs>
-	<repository>https://github.com/nextcloud/fulltextsearch_elasticsearch.git</repository>
+	<website>https://github.com/nextcloud/fulltextsearch_meilisearch</website>
+	<bugs>https://github.com/nextcloud/fulltextsearch_meilisearch/issues</bugs>
+	<repository>https://github.com/nextcloud/fulltextsearch_meilisearch.git</repository>
 	<screenshot>https://raw.githubusercontent.com/nextcloud/fulltextsearch/master/screenshots/0.3.0.png</screenshot>
 	<dependencies>
 		<nextcloud min-version="32" max-version="33"/>
 	</dependencies>
 
 	<commands>
-		<command>OCA\FullTextSearch_Elasticsearch\Command\Configure</command>
+		<command>OCA\FullTextSearch_Meilisearch\Command\Configure</command>
 	</commands>
 
 	<settings>
-		<admin>OCA\FullTextSearch_Elasticsearch\Settings\Admin</admin>
+		<admin>OCA\FullTextSearch_Meilisearch\Settings\Admin</admin>
 	</settings>
 
 	<fulltextsearch>
-		<platform>OCA\FullTextSearch_Elasticsearch\Platform\ElasticSearchPlatform</platform>
+		<platform>OCA\FullTextSearch_Meilisearch\Platform\MeilisearchPlatform</platform>
 	</fulltextsearch>
 
 </info>

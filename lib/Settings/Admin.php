@@ -7,10 +7,10 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\FullTextSearch_Elasticsearch\Settings;
+namespace OCA\FullTextSearch_Meilisearch\Settings;
 
 use Exception;
-use OCA\FullTextSearch_Elasticsearch\AppInfo\Application;
+use OCA\FullTextSearch_Meilisearch\AppInfo\Application;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\Settings\ISettings;
 

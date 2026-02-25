@@ -4,6 +4,13 @@
 -->
 # Changelog
 
+### 32.0.0
+
+- BREAKING CHANGE: replace Elasticsearch backend with Meilisearch
+- compat nc32
+- new configuration: Meilisearch host, index name, API key
+- remove Elasticsearch-specific features: ingest pipelines, custom analyzers, wildcard/regex filters
+- simplified build (no more php-scoper or ES8 fallback)
 
 ### 31.0.0
 

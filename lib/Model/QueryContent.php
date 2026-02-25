@@ -6,7 +6,7 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\FullTextSearch_Elasticsearch\Model;
+namespace OCA\FullTextSearch_Meilisearch\Model;
 
 
 use JsonSerializable;
@@ -15,7 +15,7 @@ use JsonSerializable;
 /**
  * Class QueryContent
  *
- * @package OCA\FullTextSearch_Elasticsearch\Model
+ * @package OCA\FullTextSearch_Meilisearch\Model
  */
 class QueryContent implements JsonSerializable {
 

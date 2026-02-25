@@ -5,42 +5,40 @@
 
 /** global: OCA */
 /** global: fts_admin_settings */
-/** global: elasticsearch_settings */
+/** global: meilisearch_settings */
 
 
-var elasticsearch_elements = {
-	elasticsearch_div: null,
-	elasticsearch_host: null,
-	elasticsearch_index: null,
-	analyzer_tokenizer: null,
+var meilisearch_elements = {
+	meilisearch_div: null,
+	meilisearch_host: null,
+	meilisearch_index: null,
+	meilisearch_api_key: null,
 
 
 	init: function () {
-		elasticsearch_elements.elasticsearch_div = $('#elastic_search');
-		elasticsearch_elements.elasticsearch_host = $('#elasticsearch_host');
-		elasticsearch_elements.elasticsearch_index = $('#elasticsearch_index');
-		elasticsearch_elements.analyzer_tokenizer = $('#analyzer_tokenizer');
+		meilisearch_elements.meilisearch_div = $('#meilisearch');
+		meilisearch_elements.meilisearch_host = $('#meilisearch_host');
+		meilisearch_elements.meilisearch_index = $('#meilisearch_index');
+		meilisearch_elements.meilisearch_api_key = $('#meilisearch_api_key');
 
-		elasticsearch_elements.elasticsearch_host.on('input', function () {
+		meilisearch_elements.meilisearch_host.on('input', function () {
 			fts_admin_settings.tagSettingsAsNotSaved($(this));
 		}).blur(function () {
-			elasticsearch_settings.saveSettings();
+			meilisearch_settings.saveSettings();
 		});
 
-		elasticsearch_elements.elasticsearch_index.on('input', function () {
+		meilisearch_elements.meilisearch_index.on('input', function () {
 			fts_admin_settings.tagSettingsAsNotSaved($(this));
 		}).blur(function () {
-			elasticsearch_settings.saveSettings();
+			meilisearch_settings.saveSettings();
 		});
 
-		elasticsearch_elements.analyzer_tokenizer.on('input', function () {
+		meilisearch_elements.meilisearch_api_key.on('input', function () {
 			fts_admin_settings.tagSettingsAsNotSaved($(this));
 		}).blur(function () {
-			elasticsearch_settings.saveSettings();
+			meilisearch_settings.saveSettings();
 		});
 	}
 
 
 };
-
-
