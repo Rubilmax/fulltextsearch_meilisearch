@@ -7,19 +7,13 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\FullTextSearch_Elasticsearch\Service;
+namespace OCA\FullTextSearch_Meilisearch\Service;
 
-use OCA\FullTextSearch_Elasticsearch\Vendor\Elastic\Elasticsearch\Client;
-use OCA\FullTextSearch_Elasticsearch\Vendor\Elastic\Elasticsearch\Exception\ClientResponseException;
-use OCA\FullTextSearch_Elasticsearch\Vendor\Elastic\Elasticsearch\Exception\MissingParameterException;
-use OCA\FullTextSearch_Elasticsearch\Vendor\Elastic\Elasticsearch\Exception\ServerResponseException;
-use OCA\FullTextSearch_Elasticsearch\Vendor8\Elastic\Elasticsearch\Client as Client8;
-use OCA\FullTextSearch_Elasticsearch\Vendor8\Elastic\Elasticsearch\Exception\ClientResponseException as ClientResponseException8;
-use OCA\FullTextSearch_Elasticsearch\Vendor8\Elastic\Elasticsearch\Exception\MissingParameterException as MissingParameterException8;
-use OCA\FullTextSearch_Elasticsearch\Vendor8\Elastic\Elasticsearch\Exception\ServerResponseException as ServerResponseException8;
-use OCA\FullTextSearch_Elasticsearch\Exceptions\AccessIsEmptyException;
-use OCA\FullTextSearch_Elasticsearch\Exceptions\ConfigurationException;
-use OCA\FullTextSearch_Elasticsearch\Tools\Traits\TArrayTools;
+use Meilisearch\Client;
+use Meilisearch\Exceptions\ApiException;
+use OCA\FullTextSearch_Meilisearch\Exceptions\AccessIsEmptyException;
+use OCA\FullTextSearch_Meilisearch\Exceptions\ConfigurationException;
+use OCA\FullTextSearch_Meilisearch\Tools\Traits\TArrayTools;
 use OCP\FullTextSearch\Model\IIndex;
 use OCP\FullTextSearch\Model\IIndexDocument;
 use Psr\Log\LoggerInterface;
@@ -36,109 +30,76 @@ class IndexService {
 
 
 	/**
-	 * @param Client|Client8 $client
+	 * @param Client $client
 	 *
 	 * @return bool
-	 * @throws ClientResponseException|ClientResponseException8
 	 * @throws ConfigurationException
-	 * @throws MissingParameterException|MissingParameterException8
-	 * @throws ServerResponseException|ServerResponseException8
 	 */
-	public function testIndex(Client|Client8 $client): bool {
-		$map = $this->indexMappingService->generateGlobalMap(false);
-		$map['client'] = [
-			'verbose' => true
-		];
-
-		$result = $client->indices()
-						 ->exists($map);
-
-		return $result->asBool();
+	public function testIndex(Client $client): bool {
+		try {
+			$client->getIndex($this->indexMappingService->getIndexName());
+			return true;
+		} catch (ApiException) {
+			return false;
+		}
 	}
 
 
 	/**
-	 * @param Client|Client8 $client
+	 * @param Client $client
 	 *
 	 * @throws ConfigurationException
-	 * @throws MissingParameterException|MissingParameterException8
-	 * @throws ServerResponseException|ServerResponseException8
 	 */
-	public function initializeIndex(Client|Client8 $client): void {
-		try {
-			if ($client->indices()
-					   ->exists($this->indexMappingService->generateGlobalMap(false))
-					   ->asBool()) {
-				return;
-			}
-		} catch (ClientResponseException|ClientResponseException8 $e) {
-			$this->logger->error($e->getMessage(), ['exception' => $e]);
-		}
+	public function initializeIndex(Client $client): void {
+		$indexName = $this->indexMappingService->getIndexName();
 
 		try {
-			$client->indices()
-				   ->create($this->indexMappingService->generateGlobalMap());
-		} catch (ClientResponseException|ClientResponseException8 $e) {
-			$this->logger->error('reset index all', ['exception' => $e]);
-			$this->resetIndexAll($client);
+			$client->getIndex($indexName);
+		} catch (ApiException) {
+			$client->createIndex($indexName, ['primaryKey' => 'id']);
 		}
 
-		try {
-			$client->ingest()
-				   ->putPipeline($this->indexMappingService->generateGlobalIngest());
-		} catch (ClientResponseException|ClientResponseException8 $e) {
-			$this->logger->error('reset index all', ['exception' => $e]);
-			$this->resetIndexAll($client);
-		}
+		$this->indexMappingService->configureIndexSettings($client);
 	}
 
 
 	/**
-	 * @param Client|Client8 $client
+	 * @param Client $client
 	 * @param string $providerId
 	 *
 	 * @throws ConfigurationException
 	 */
-	public function resetIndex(Client|Client8 $client, string $providerId): void {
+	public function resetIndex(Client $client, string $providerId): void {
 		try {
-			$client->deleteByQuery($this->indexMappingService->generateDeleteQuery($providerId));
-		} catch (ClientResponseException|ClientResponseException8 $e) {
-			$this->logger->error('reset index all', ['exception' => $e]);
+			$index = $client->index($this->indexMappingService->getIndexName());
+			$index->deleteDocuments(['filter' => "provider = '" . addcslashes($providerId, "'") . "'"]);
+		} catch (ApiException $e) {
+			$this->logger->error('reset index', ['exception' => $e]);
 		}
 	}
 
 
 	/**
-	 * @param Client|Client8 $client
+	 * @param Client $client
 	 *
 	 * @throws ConfigurationException
-	 * @throws MissingParameterException|MissingParameterException8
-	 * @throws ServerResponseException|ServerResponseException8
 	 */
-	public function resetIndexAll(Client|Client8 $client): void {
+	public function resetIndexAll(Client $client): void {
 		try {
-			$client->ingest()
-				   ->deletePipeline($this->indexMappingService->generateGlobalIngest(false));
-		} catch (ClientResponseException|ClientResponseException8 $e) {
-			$this->logger->warning($e->getMessage(), ['exception' => $e]);
-		}
-
-		try {
-			$client->indices()
-				   ->delete($this->indexMappingService->generateGlobalMap(false));
-		} catch (ClientResponseException|ClientResponseException8 $e) {
+			$client->deleteIndex($this->indexMappingService->getIndexName());
+		} catch (ApiException $e) {
 			$this->logger->warning($e->getMessage(), ['exception' => $e]);
 		}
 	}
 
 
 	/**
-	 * @param Client|Client8 $client
+	 * @param Client $client
 	 * @param IIndex $index
 	 *
 	 * @throws ConfigurationException
 	 */
-	public function deleteIndex(Client|Client8 $client, IIndex $index): void {
+	public function deleteIndex(Client $client, IIndex $index): void {
 		$this->indexMappingService->indexDocumentRemove(
 			$client,
 			$index->getProviderId(),
@@ -148,14 +109,14 @@ class IndexService {
 
 
 	/**
-	 * @param Client|Client8 $client
+	 * @param Client $client
 	 * @param IIndexDocument $document
 	 *
 	 * @return array
 	 * @throws ConfigurationException
 	 * @throws AccessIsEmptyException
 	 */
-	public function indexDocument(Client|Client8 $client, IIndexDocument $document): array {
+	public function indexDocument(Client $client, IIndexDocument $document): array {
 		$result = [];
 		$index = $document->getIndex();
 		if ($index->isStatus(IIndex::INDEX_REMOVE)) {
@@ -193,7 +154,6 @@ class IndexService {
 			return $index;
 		}
 
-		// TODO: parse result
 		if ($index->getErrorCount() === 0) {
 			$index->setStatus(IIndex::INDEX_DONE);
 		}

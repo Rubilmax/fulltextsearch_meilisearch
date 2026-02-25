@@ -7,14 +7,14 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\FullTextSearch_Elasticsearch\Tools\Exceptions;
+namespace OCA\FullTextSearch_Meilisearch\Tools\Exceptions;
 
 use Exception;
 
 /**
  * Class ItemNotFoundException
  *
- * @package OCA\FullTextSearch_Elasticsearch\Tools\Exceptions
+ * @package OCA\FullTextSearch_Meilisearch\Tools\Exceptions
  */
 class ItemNotFoundException extends Exception {
 }

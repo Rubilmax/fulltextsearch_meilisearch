@@ -1,18 +1,17 @@
 {
-  "name": "nextcloud/fulltextsearch_elasticsearch",
-  "description": "fulltextsearch_elasticsearch",
+  "name": "nextcloud/fulltextsearch_meilisearch",
+  "description": "fulltextsearch_meilisearch",
   "minimum-stability": "stable",
   "license": "agpl",
   "config": {
     "optimize-autoloader": true,
     "classmap-authoritative": true,
-    "autoloader-suffix": "FullTextSearch_Elasticsearch",
+    "autoloader-suffix": "FullTextSearch_Meilisearch",
     "platform": {
       "php": "8.2"
     },
     "sort-packages": true,
     "allow-plugins": {
-      "php-http/discovery": true,
       "bamarni/composer-bin-plugin": true
     }
   },
@@ -24,7 +23,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "OCA\\FullTextSearch_Elasticsearch\\": "lib/"
+      "OCA\\FullTextSearch_Meilisearch\\": "lib/"
     }
   },
   "scripts": {
@@ -38,30 +37,12 @@
       "@test:unit"
     ],
     "test:unit": "./vendor-bin/phpunit/vendor/bin/phpunit -c tests/unit/phpunit.xml",
-    "lint": "find . -name \\*.php -not -path './vendor/*' -not -path './vendor-bin/*' -not -path './lib/Vendor/*'  -print0 | xargs -0 -n1 php -l",
-    "post-install-cmd": [
-      "@composer bin all install --ignore-platform-reqs",
-      "@php vendor/bin/php-scoper add-prefix --force",
-      "rm -Rf lib/Vendor && mv build lib/Vendor",
-      "find lib/Vendor/ -maxdepth 1 -mindepth 1 -type d | cut -d '/' -f3 | xargs -I {} rm -Rf vendor/{}",
-      "@php lib-vendor-organizer.php lib/Vendor/ OCA\\\\FullTextSearch_Elasticsearch\\\\Vendor",
-      "@composer install --working-dir=es8",
-      "composer dump-autoload -o"
-    ],
-    "post-update-cmd": [
-      "@composer bin all install --ignore-platform-reqs",
-      "@php vendor/bin/php-scoper add-prefix --force",
-      "rm -Rf lib/Vendor && mv build lib/Vendor",
-      "find lib/Vendor/ -maxdepth 1 -mindepth 1 -type d | cut -d '/' -f3 | xargs -I {} rm -Rf vendor/{}",
-      "@php lib-vendor-organizer.php lib/Vendor/ OCA\\\\FullTextSearch_Elasticsearch\\\\Vendor",
-      "@composer install --working-dir=es8",
-      "composer dump-autoload -o"
-    ]
+    "lint": "find . -name \\*.php -not -path './vendor/*' -not -path './vendor-bin/*' -print0 | xargs -0 -n1 php -l"
   },
   "require": {
     "bamarni/composer-bin-plugin": "^1.8",
     "guzzlehttp/guzzle": "^7.0.0",
-    "elasticsearch/elasticsearch": "^9.2"
+    "meilisearch/meilisearch-php": "^1.0"
   },
   "require-dev": {
     "nextcloud/ocp": "dev-master"

@@ -7,14 +7,14 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\FullTextSearch_Elasticsearch\Tools\Traits;
+namespace OCA\FullTextSearch_Meilisearch\Tools\Traits;
 
 use Exception;
 use JsonSerializable;
-use OCA\FullTextSearch_Elasticsearch\Tools\Exceptions\ArrayNotFoundException;
-use OCA\FullTextSearch_Elasticsearch\Tools\Exceptions\ItemNotFoundException;
-use OCA\FullTextSearch_Elasticsearch\Tools\Exceptions\MalformedArrayException;
-use OCA\FullTextSearch_Elasticsearch\Tools\Exceptions\UnknownTypeException;
+use OCA\FullTextSearch_Meilisearch\Tools\Exceptions\ArrayNotFoundException;
+use OCA\FullTextSearch_Meilisearch\Tools\Exceptions\ItemNotFoundException;
+use OCA\FullTextSearch_Meilisearch\Tools\Exceptions\MalformedArrayException;
+use OCA\FullTextSearch_Meilisearch\Tools\Exceptions\UnknownTypeException;
 
 trait TArrayTools {
 	public static $TYPE_NULL = 'Null';

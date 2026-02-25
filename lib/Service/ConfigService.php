@@ -6,71 +6,63 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\FullTextSearch_Elasticsearch\Service;
+namespace OCA\FullTextSearch_Meilisearch\Service;
 
 
-use OCA\FullTextSearch_Elasticsearch\AppInfo\Application;
-use OCA\FullTextSearch_Elasticsearch\ConfigLexicon;
-use OCA\FullTextSearch_Elasticsearch\Exceptions\ConfigurationException;
+use OCA\FullTextSearch_Meilisearch\ConfigLexicon;
+use OCA\FullTextSearch_Meilisearch\Exceptions\ConfigurationException;
 use OCP\AppFramework\Services\IAppConfig;
-use OCP\IConfig;
 
 
-/**
- * Class ConfigService
- *
- * @package OCA\FullTextSearch_Elasticsearch\Service
- */
 class ConfigService {
 	public function __construct(
-		private readonly IConfig $config,
 		private readonly IAppConfig $appConfig,
 	) {
 	}
 
 	public function getConfig(): array {
 		return [
-			ConfigLexicon::FIELDS_LIMIT => $this->appConfig->getAppValueInt(ConfigLexicon::FIELDS_LIMIT),
-			ConfigLexicon::ELASTIC_HOST => $this->appConfig->getAppValueString(ConfigLexicon::ELASTIC_HOST),
-			ConfigLexicon::ELASTIC_INDEX => $this->appConfig->getAppValueString(ConfigLexicon::ELASTIC_INDEX),
-			ConfigLexicon::ELASTIC_LOGGER_ENABLED => $this->appConfig->getAppValueBool(ConfigLexicon::ELASTIC_LOGGER_ENABLED),
-			ConfigLexicon::ANALYZER_TOKENIZER => $this->appConfig->getAppValueString(ConfigLexicon::ANALYZER_TOKENIZER),
-			ConfigLexicon::ALLOW_SELF_SIGNED_CERT => $this->appConfig->getAppValueBool(ConfigLexicon::ALLOW_SELF_SIGNED_CERT),
+			ConfigLexicon::MEILISEARCH_HOST => $this->appConfig->getAppValueString(ConfigLexicon::MEILISEARCH_HOST),
+			ConfigLexicon::MEILISEARCH_INDEX => $this->appConfig->getAppValueString(ConfigLexicon::MEILISEARCH_INDEX),
+			ConfigLexicon::MEILISEARCH_API_KEY => $this->appConfig->getAppValueString(ConfigLexicon::MEILISEARCH_API_KEY),
 		];
 	}
 
 	public function setConfig(array $save): void {
-		foreach(array_keys($save) as $k) {
-			switch($k) {
-				case ConfigLexicon::FIELDS_LIMIT:
-					$this->appConfig->setAppValueInt($k, $save[$k]);
-					break;
-
-				case ConfigLexicon::ELASTIC_HOST:
-				case ConfigLexicon::ELASTIC_INDEX:
-				case ConfigLexicon::ANALYZER_TOKENIZER:
+		foreach (array_keys($save) as $k) {
+			switch ($k) {
+				case ConfigLexicon::MEILISEARCH_HOST:
+				case ConfigLexicon::MEILISEARCH_INDEX:
+				case ConfigLexicon::MEILISEARCH_API_KEY:
 					$this->appConfig->setAppValueString($k, $save[$k]);
-					break;
-
-				case ConfigLexicon::ELASTIC_LOGGER_ENABLED:
-				case ConfigLexicon::ALLOW_SELF_SIGNED_CERT:
-					$this->appConfig->setAppValueBool($k, $save[$k]);
 					break;
 			}
 		}
 	}
 
-	public function getElasticIndex(): string {
-		$index = $this->appConfig->getAppValueString(ConfigLexicon::ELASTIC_INDEX);
+	public function getMeilisearchIndex(): string {
+		$index = $this->appConfig->getAppValueString(ConfigLexicon::MEILISEARCH_INDEX);
 		if ($index === '') {
-			throw new ConfigurationException('Your ElasticSearchPlatform is not configured properly');
+			throw new ConfigurationException('Your MeilisearchPlatform is not configured properly');
 		}
 
 		return $index;
+	}
+
+	public function getMeilisearchHost(): string {
+		$host = $this->appConfig->getAppValueString(ConfigLexicon::MEILISEARCH_HOST);
+		if ($host === '') {
+			throw new ConfigurationException('Your MeilisearchPlatform is not configured properly');
+		}
+
+		return $host;
+	}
+
+	public function getMeilisearchApiKey(): string {
+		return $this->appConfig->getAppValueString(ConfigLexicon::MEILISEARCH_API_KEY);
 	}
 
 	public function checkConfig(array $data): bool {
 		return true;
 	}
 }
-

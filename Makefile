@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2017 Nextcloud GmbH and Nextcloud contributors
 # SPDX-License-Identifier: AGPL-3.0-or-later
-app_name=FullTextSearch_ElasticSearch
+app_name=FullTextSearch_Meilisearch
 
 build_dir=$(CURDIR)/build/artifacts
 appstore_dir=$(build_dir)/appstore
@@ -83,7 +83,6 @@ appstore: clean composer
 	--exclude=/docs \
 	--exclude=/translationfiles \
 	--exclude=/.tx \
-	--exclude=/es8 \
 	--exclude=/tests \
 	--exclude=.git \
 	--exclude=/.github \
@@ -92,10 +91,7 @@ appstore: clean composer
 	--exclude=/issue_template.md \
 	--exclude=/README.md \
 	--exclude=/composer.json \
-	--exclude=/lib-vendor-organizer.php \
-	--exclude=/scoper.inc.php \
 	--exclude=/vendor \
-	--exclude=/lib/VendorPsr \
 	--exclude=/vendor-bin \
 	--exclude=/composer.lock \
 	--exclude=/.gitattributes \
