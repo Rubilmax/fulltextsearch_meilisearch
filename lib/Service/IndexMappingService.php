@@ -38,6 +38,22 @@ class IndexMappingService {
 		return self::encodeLegacyDocumentId($providerId, $documentId);
 	}
 
+	/**
+	 * Candidate IDs used for backwards-compatible lookups/deletes.
+	 *
+	 * @return string[]
+	 */
+	public static function getDocumentIdCandidates(string $providerId, string $documentId): array {
+		return array_values(
+			array_unique(
+				[
+					self::encodeDocumentId($providerId, $documentId),
+					self::encodeLegacyDocumentId($providerId, $documentId),
+				]
+			)
+		);
+	}
+
 
 	/**
 	 * Decode a Meilisearch document ID back to [providerId, documentId].
@@ -209,10 +225,7 @@ class IndexMappingService {
 	 */
 	public function indexDocumentRemove(Client $client, string $providerId, string $documentId): void {
 		$index = $client->index($this->configService->getMeilisearchIndex());
-		$docIds = array_unique([
-			self::encodeDocumentId($providerId, $documentId),
-			self::encodeLegacyDocumentId($providerId, $documentId),
-		]);
+		$docIds = self::getDocumentIdCandidates($providerId, $documentId);
 
 		foreach ($docIds as $docId) {
 			try {
@@ -251,7 +264,10 @@ class IndexMappingService {
 
 		$content = $document->getContent();
 		if ($content !== '' && $document->isContentEncoded() === IIndexDocument::ENCODED_BASE64) {
-			$decoded = base64_decode($content);
+			$decoded = base64_decode($content, true);
+			if ($decoded === false) {
+				$decoded = base64_decode(strtr($content, '-_', '+/'), true);
+			}
 			$content = ($decoded !== false && mb_check_encoding($decoded, 'UTF-8'))
 				? $decoded
 				: '';

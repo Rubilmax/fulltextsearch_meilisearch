@@ -72,7 +72,7 @@ class IndexService {
 	public function resetIndex(Client $client, string $providerId): void {
 		try {
 			$index = $client->index($this->indexMappingService->getIndexName());
-			$index->deleteDocuments(['filter' => "provider = '" . addcslashes($providerId, "'") . "'"]);
+			$index->deleteDocuments(['filter' => "provider = '" . $this->escapeFilterValue($providerId) . "'"]);
 		} catch (ApiException $e) {
 			$this->logger->error('reset index', ['exception' => $e]);
 		}
@@ -160,5 +160,9 @@ class IndexService {
 		}
 
 		return $index;
+	}
+
+	private function escapeFilterValue(string $value): string {
+		return str_replace(['\\', "'"], ['\\\\', "\\'"], $value);
 	}
 }

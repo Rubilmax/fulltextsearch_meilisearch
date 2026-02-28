@@ -11,6 +11,7 @@ namespace OCA\FullTextSearch_Meilisearch\Service;
 
 use Exception;
 use Meilisearch\Client;
+use Meilisearch\Exceptions\ApiException;
 use OC\FullTextSearch\Model\DocumentAccess;
 use OC\FullTextSearch\Model\IndexDocument;
 use OCA\FullTextSearch_Meilisearch\Exceptions\ConfigurationException;
@@ -104,9 +105,24 @@ class SearchService {
 		string $providerId,
 		string $documentId
 	): IIndexDocument {
-		$docId = $this->searchMappingService->getDocumentQuery($providerId, $documentId);
 		$index = $client->index($this->configService->getMeilisearchIndex());
-		$result = $index->getDocument($docId);
+		$result = null;
+		$docIds = IndexMappingService::getDocumentIdCandidates($providerId, $documentId);
+		foreach ($docIds as $docId) {
+			try {
+				$result = $index->getDocument($docId);
+				break;
+			} catch (ApiException $e) {
+				$isLastCandidate = ($docId === $docIds[array_key_last($docIds)]);
+				if ($isLastCandidate || $e->getCode() !== 404) {
+					throw $e;
+				}
+			}
+		}
+
+		if (!is_array($result)) {
+			$result = [];
+		}
 
 		$access = new DocumentAccess((string)($result['owner'] ?? ''));
 		$access->setUsers((array)($result['users'] ?? []));
@@ -120,7 +136,7 @@ class SearchService {
 		$doc->setSubTags((array)($result['subtags'] ?? []));
 		$doc->setTags((array)($result['tags'] ?? []));
 		$doc->setHash((string)($result['hash'] ?? ''));
-		$doc->setModifiedTime($result['lastModified'] ?? 0);
+		$doc->setModifiedTime((int)($result['lastModified'] ?? 0));
 		$doc->setSource((string)($result['source'] ?? ''));
 		$doc->setTitle((string)($result['title'] ?? ''));
 		$doc->setParts((array)($result['parts'] ?? []));
@@ -171,9 +187,9 @@ class SearchService {
 	 */
 	private function updateSearchResult(ISearchResult $searchResult, array $result): void {
 		$searchResult->setRawResult($this->encodeJson($result));
-		$searchResult->setTotal($result['estimatedTotalHits'] ?? $result['totalHits'] ?? 0);
+		$searchResult->setTotal((int)($result['estimatedTotalHits'] ?? $result['totalHits'] ?? 0));
 		$searchResult->setMaxScore(0);
-		$searchResult->setTime($result['processingTimeMs'] ?? 0);
+		$searchResult->setTime((int)($result['processingTimeMs'] ?? 0));
 		$searchResult->setTimedOut(false);
 	}
 
@@ -198,6 +214,9 @@ class SearchService {
 		$document->setTitle($this->get('title', $entry));
 
 		$formatted = $entry['_formatted'] ?? [];
+		if (!is_array($formatted)) {
+			$formatted = [];
+		}
 		$document->setExcerpts($this->parseSearchEntryExcerpts($formatted));
 
 		return $document;
