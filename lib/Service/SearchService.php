@@ -71,7 +71,7 @@ class SearchService {
 			throw $e;
 		}
 
-		$raw = $result->getRaw();
+		$raw = $this->extractRawSearchResult($result);
 		$this->logger->debug('result from Meilisearch', ['result' => $raw]);
 		$this->updateSearchResult($searchResult, $raw);
 
@@ -172,6 +172,10 @@ class SearchService {
 	private function getDocumentInfos(IndexDocument $index, array $source): void {
 		$ak = array_keys($source);
 		foreach ($ak as $k) {
+			if (!is_string($k)) {
+				continue;
+			}
+
 			if (str_starts_with($k, 'info_')) {
 				continue;
 			}
@@ -289,6 +293,33 @@ class SearchService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * @param mixed $result
+	 *
+	 * @return array
+	 */
+	private function extractRawSearchResult(mixed $result): array {
+		if (is_array($result)) {
+			return $result;
+		}
+
+		if (is_object($result) && method_exists($result, 'getRaw')) {
+			$raw = $result->getRaw();
+			if (is_array($raw)) {
+				return $raw;
+			}
+		}
+
+		if (is_object($result) && method_exists($result, 'toArray')) {
+			$raw = $result->toArray();
+			if (is_array($raw)) {
+				return $raw;
+			}
+		}
+
+		return [];
 	}
 
 	/**

@@ -45,13 +45,17 @@ class SettingsController extends Controller {
 	}
 
 	/**
-	 * @param array $data
+	 * @param mixed $data
 	 *
 	 * @return DataResponse
 	 * @throws Exception
 	 */
 	#[AdminRequired]
-	public function setSettingsAdmin(array $data = []): DataResponse {
+	public function setSettingsAdmin($data = []): DataResponse {
+		if (!is_array($data)) {
+			$data = [];
+		}
+
 		if ($this->configService->checkConfig($data)) {
 			$this->configService->setConfig($data);
 		}

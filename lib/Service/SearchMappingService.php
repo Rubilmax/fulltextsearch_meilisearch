@@ -210,17 +210,25 @@ class SearchMappingService {
 	private function buildSimpleQueryFilter(array $queries): string {
 		$parts = [];
 		foreach ($queries as $query) {
+			if (!$query instanceof ISearchRequestSimpleQuery) {
+				continue;
+			}
+
 			$field = $this->sanitizeFilterField($query->getField());
 			if ($field === null) {
 				continue;
 			}
 
 			$values = $query->getValues();
-			if ($values === []) {
+			if (!is_array($values) || $values === []) {
 				continue;
 			}
 
-			$value = $values[0];
+			$normalizedValues = array_values($values);
+			if (!array_key_exists(0, $normalizedValues)) {
+				continue;
+			}
+			$value = $normalizedValues[0];
 
 			switch ($query->getType()) {
 				case ISearchRequestSimpleQuery::COMPARE_TYPE_KEYWORD:

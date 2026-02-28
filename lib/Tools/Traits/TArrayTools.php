@@ -9,12 +9,12 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch_Meilisearch\Tools\Traits;
 
-use Exception;
 use JsonSerializable;
 use OCA\FullTextSearch_Meilisearch\Tools\Exceptions\ArrayNotFoundException;
 use OCA\FullTextSearch_Meilisearch\Tools\Exceptions\ItemNotFoundException;
 use OCA\FullTextSearch_Meilisearch\Tools\Exceptions\MalformedArrayException;
 use OCA\FullTextSearch_Meilisearch\Tools\Exceptions\UnknownTypeException;
+use Throwable;
 
 trait TArrayTools {
 	public static $TYPE_NULL = 'Null';
@@ -142,7 +142,12 @@ trait TArrayTools {
 					return $default;
 				}
 
-				return $this->getBool($subs[1], $arr[$subs[0]], $default);
+				$r = $arr[$subs[0]];
+				if (!is_array($r)) {
+					return $default;
+				}
+
+				return $this->getBool($subs[1], $r, $default);
 			} else {
 				return $default;
 			}
@@ -184,7 +189,12 @@ trait TArrayTools {
 					return $default;
 				}
 
-				return $this->getObj($subs[1], $arr[$subs[0]], $default);
+				$r = $arr[$subs[0]];
+				if (!is_array($r)) {
+					return $default;
+				}
+
+				return $this->getObj($subs[1], $r, $default);
 			} else {
 				return $default;
 			}
@@ -285,7 +295,7 @@ trait TArrayTools {
 				$o->$method($item);
 
 				$r[] = $o;
-			} catch (Exception $e) {
+			} catch (Throwable $e) {
 			}
 		}
 
@@ -303,6 +313,10 @@ trait TArrayTools {
 	 */
 	protected function extractArray(string $k, string $value, array $list) {
 		foreach ($list as $arr) {
+			if (!is_array($arr)) {
+				continue;
+			}
+
 			if (!array_key_exists($k, $arr)) {
 				continue;
 			}
