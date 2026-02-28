@@ -131,12 +131,13 @@ class MeilisearchPlatform implements IFullTextSearchPlatform {
 	 */
 	public function indexDocument(IIndexDocument $document): IIndex {
 		$document->initHash();
+		$indexingException = null;
 		try {
 			$result = $this->indexService->indexDocument($this->getClient(), $document);
 			$index = $this->indexService->parseIndexResult($document->getIndex(), $result);
 
 			$this->updateNewIndexResult(
-				$document->getIndex(), json_encode($result), 'ok',
+				$document->getIndex(), $this->encodeJson($result), 'ok',
 				IRunner::RESULT_TYPE_SUCCESS
 			);
 
@@ -144,15 +145,20 @@ class MeilisearchPlatform implements IFullTextSearchPlatform {
 		} catch (CommunicationException) {
 			throw new PlatformTemporaryException();
 		} catch (Exception $e) {
+			$indexingException = $e;
 			$this->manageIndexErrorException($document, $e);
 		}
 
+		if ($indexingException === null) {
+			return $document->getIndex();
+		}
+
 		try {
-			$result = $this->indexDocumentError($document, $e);
+			$result = $this->indexDocumentError($document, $indexingException);
 			$index = $this->indexService->parseIndexResult($document->getIndex(), $result);
 
 			$this->updateNewIndexResult(
-				$document->getIndex(), json_encode($result), 'ok',
+				$document->getIndex(), $this->encodeJson($result), 'ok',
 				IRunner::RESULT_TYPE_WARNING
 			);
 
@@ -279,6 +285,20 @@ class MeilisearchPlatform implements IFullTextSearchPlatform {
 		}
 
 		$this->runner->newIndexResult($index, $message, $status, $type);
+	}
+
+	/**
+	 * @param array $data
+	 *
+	 * @return string
+	 */
+	private function encodeJson(array $data): string {
+		$json = json_encode($data, JSON_INVALID_UTF8_SUBSTITUTE);
+		if ($json === false) {
+			return '{}';
+		}
+
+		return $json;
 	}
 
 

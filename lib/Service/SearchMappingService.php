@@ -197,26 +197,41 @@ class SearchMappingService {
 		$parts = [];
 		foreach ($queries as $query) {
 			$field = $query->getField();
-			$value = $query->getValues()[0];
+			$values = $query->getValues();
+			if ($values === []) {
+				continue;
+			}
+
+			$value = $values[0];
 
 			switch ($query->getType()) {
 				case ISearchRequestSimpleQuery::COMPARE_TYPE_KEYWORD:
 					$parts[] = "$field = '" . $this->escapeFilterValue((string)$value) . "'";
 					break;
 				case ISearchRequestSimpleQuery::COMPARE_TYPE_INT_EQ:
-					$parts[] = "$field = $value";
+					if (is_numeric($value)) {
+						$parts[] = "$field = " . (int)$value;
+					}
 					break;
 				case ISearchRequestSimpleQuery::COMPARE_TYPE_INT_GTE:
-					$parts[] = "$field >= $value";
+					if (is_numeric($value)) {
+						$parts[] = "$field >= " . (int)$value;
+					}
 					break;
 				case ISearchRequestSimpleQuery::COMPARE_TYPE_INT_LTE:
-					$parts[] = "$field <= $value";
+					if (is_numeric($value)) {
+						$parts[] = "$field <= " . (int)$value;
+					}
 					break;
 				case ISearchRequestSimpleQuery::COMPARE_TYPE_INT_GT:
-					$parts[] = "$field > $value";
+					if (is_numeric($value)) {
+						$parts[] = "$field > " . (int)$value;
+					}
 					break;
 				case ISearchRequestSimpleQuery::COMPARE_TYPE_INT_LT:
-					$parts[] = "$field < $value";
+					if (is_numeric($value)) {
+						$parts[] = "$field < " . (int)$value;
+					}
 					break;
 				case ISearchRequestSimpleQuery::COMPARE_TYPE_WILDCARD:
 					// Meilisearch does not support wildcard filters - silently ignored

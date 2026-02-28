@@ -38,7 +38,12 @@ class IndexMappingService {
 	 */
 	public static function decodeDocumentId(string $encodedId): array {
 		$decoded = str_replace('_-_', ':', $encodedId);
-		return explode(':', $decoded, 2);
+		$parts = explode(':', $decoded, 2);
+		if (count($parts) < 2) {
+			return [$parts[0] ?? '', ''];
+		}
+
+		return [$parts[0], $parts[1]];
 	}
 
 
@@ -94,7 +99,7 @@ class IndexMappingService {
 
 		$result = $index->addDocuments([$body]);
 
-		return (array)$result;
+		return $result->toArray();
 	}
 
 
@@ -114,7 +119,7 @@ class IndexMappingService {
 
 		$result = $index->updateDocuments([$body]);
 
-		return (array)$result;
+		return $result->toArray();
 	}
 
 
