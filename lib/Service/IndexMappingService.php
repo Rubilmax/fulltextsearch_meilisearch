@@ -158,21 +158,25 @@ class IndexMappingService {
 	public function configureIndexSettings(Client $client): void {
 		$index = $client->index($this->configService->getMeilisearchIndex());
 
-		$index->updateFilterableAttributes([
+		$tasks = [];
+		$tasks[] = $index->updateFilterableAttributes([
 			'owner', 'users', 'groups', 'circles', 'links',
 			'provider', 'metatags', 'subtags', 'tags', 'source',
 			'lastModified',
 		]);
 
-		$index->updateSearchableAttributes([
-			'title', 'content',
+		$tasks[] = $index->updateSearchableAttributes([
+			'title', 'content', 'parts',
 		]);
 
-		$index->updateSortableAttributes([
+		$tasks[] = $index->updateSortableAttributes([
 			'lastModified',
 		]);
 
-		$index->updateDisplayedAttributes(['*']);
+		$tasks[] = $index->updateDisplayedAttributes(['*']);
+		foreach ($tasks as $task) {
+			$this->waitForTaskCompletion($client, $task);
+		}
 	}
 
 
@@ -275,5 +279,18 @@ class IndexMappingService {
 		$body['content'] = $content;
 
 		return array_merge($document->getInfoAll(), $body);
+	}
+
+	private function waitForTaskCompletion(Client $client, mixed $task): void {
+		if (!is_array($task)) {
+			return;
+		}
+
+		$taskUid = $task['taskUid'] ?? $task['uid'] ?? null;
+		if (!is_scalar($taskUid) || !is_numeric((string)$taskUid)) {
+			return;
+		}
+
+		$client->waitForTask((int)$taskUid, 30000, 100);
 	}
 }

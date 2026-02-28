@@ -17,6 +17,20 @@ use OCP\FullTextSearch\Model\ISearchRequestSimpleQuery;
 
 
 class SearchMappingService {
+	private const DEFAULT_PAGE_SIZE = 20;
+	private const FILTERABLE_FIELDS = [
+		'owner',
+		'users',
+		'groups',
+		'circles',
+		'links',
+		'provider',
+		'metatags',
+		'subtags',
+		'tags',
+		'source',
+		'lastModified',
+	];
 
 	public function __construct(
 		private ConfigService $configService
@@ -40,7 +54,8 @@ class SearchMappingService {
 	): array {
 		$searchString = $request->getSearch();
 		$page = max(1, (int)$request->getPage());
-		$size = max(0, (int)$request->getSize());
+		$requestedSize = (int)$request->getSize();
+		$size = ($requestedSize > 0) ? $requestedSize : self::DEFAULT_PAGE_SIZE;
 
 		$filter = $this->buildFilterExpression($request, $access, $providerId);
 
@@ -129,9 +144,12 @@ class SearchMappingService {
 	 */
 	private function buildAccessFilter(IDocumentAccess $access): string {
 		$parts = [];
-		$viewerId = $this->escapeFilterValue($access->getViewerId());
-		$parts[] = "owner = '$viewerId'";
-		$parts[] = "users = '$viewerId'";
+		$viewerId = trim($access->getViewerId());
+		if ($viewerId !== '') {
+			$viewerId = $this->escapeFilterValue($viewerId);
+			$parts[] = "owner = '$viewerId'";
+			$parts[] = "users = '$viewerId'";
+		}
 		$parts[] = "users = '__all'";
 
 		foreach ($access->getGroups() as $group) {
@@ -148,7 +166,14 @@ class SearchMappingService {
 			$parts[] = "circles = '" . $this->escapeFilterValue((string)$circle) . "'";
 		}
 
-		return implode(' OR ', $parts);
+		foreach ($access->getLinks() as $link) {
+			if (!is_scalar($link)) {
+				continue;
+			}
+			$parts[] = "links = '" . $this->escapeFilterValue((string)$link) . "'";
+		}
+
+		return implode(' OR ', array_values(array_unique($parts)));
 	}
 
 
@@ -219,50 +244,70 @@ class SearchMappingService {
 				continue;
 			}
 
-			$values = $query->getValues();
-			if (!is_array($values) || $values === []) {
+			$values = $this->normalizeScalarValues($query->getValues());
+			if ($values === []) {
 				continue;
 			}
-
-			$normalizedValues = array_values($values);
-			if (!array_key_exists(0, $normalizedValues)) {
-				continue;
-			}
-			$value = $normalizedValues[0];
 
 			switch ($query->getType()) {
+				/* Meilisearch has no dedicated text filter operator, so this is an exact match. */
+				case ISearchRequestSimpleQuery::COMPARE_TYPE_TEXT:
 				case ISearchRequestSimpleQuery::COMPARE_TYPE_KEYWORD:
-					if (is_scalar($value)) {
-						$parts[] = "$field = '" . $this->escapeFilterValue((string)$value) . "'";
+				case ISearchRequestSimpleQuery::COMPARE_TYPE_ARRAY:
+					$keywordExpr = $this->buildKeywordSimpleQuery($field, $values);
+					if ($keywordExpr !== '') {
+						$parts[] = $keywordExpr;
 					}
 					break;
 				case ISearchRequestSimpleQuery::COMPARE_TYPE_INT_EQ:
-					if (is_numeric($value)) {
-						$parts[] = "$field = " . (int)$value;
+					$numericValues = array_values(array_filter($values, 'is_numeric'));
+					if ($numericValues !== []) {
+						$parts[] = $this->buildIntEqualitySimpleQuery($field, $numericValues);
 					}
 					break;
 				case ISearchRequestSimpleQuery::COMPARE_TYPE_INT_GTE:
-					if (is_numeric($value)) {
-						$parts[] = "$field >= " . (int)$value;
+					$value = $this->extractFirstNumericValue($values);
+					if ($value !== null) {
+						$parts[] = "$field >= $value";
 					}
 					break;
 				case ISearchRequestSimpleQuery::COMPARE_TYPE_INT_LTE:
-					if (is_numeric($value)) {
-						$parts[] = "$field <= " . (int)$value;
+					$value = $this->extractFirstNumericValue($values);
+					if ($value !== null) {
+						$parts[] = "$field <= $value";
 					}
 					break;
 				case ISearchRequestSimpleQuery::COMPARE_TYPE_INT_GT:
-					if (is_numeric($value)) {
-						$parts[] = "$field > " . (int)$value;
+					$value = $this->extractFirstNumericValue($values);
+					if ($value !== null) {
+						$parts[] = "$field > $value";
 					}
 					break;
 				case ISearchRequestSimpleQuery::COMPARE_TYPE_INT_LT:
-					if (is_numeric($value)) {
-						$parts[] = "$field < " . (int)$value;
+					$value = $this->extractFirstNumericValue($values);
+					if ($value !== null) {
+						$parts[] = "$field < $value";
 					}
 					break;
+				case ISearchRequestSimpleQuery::COMPARE_TYPE_BOOL:
+					$boolValues = [];
+					foreach ($values as $value) {
+						$bool = $this->normalizeBooleanValue($value);
+						if ($bool === null) {
+							continue;
+						}
+						$boolValues[] = $bool;
+					}
+					if ($boolValues !== []) {
+						$boolExpr = $this->buildBooleanSimpleQuery($field, $boolValues);
+						if ($boolExpr !== '') {
+							$parts[] = $boolExpr;
+						}
+					}
+					break;
+				case ISearchRequestSimpleQuery::COMPARE_TYPE_REGEX:
 				case ISearchRequestSimpleQuery::COMPARE_TYPE_WILDCARD:
-					// Meilisearch does not support wildcard filters - silently ignored
+					// Meilisearch does not support regex/wildcard filters - silently ignored
 					break;
 			}
 		}
@@ -312,6 +357,116 @@ class SearchMappingService {
 			return null;
 		}
 
+		if (!in_array($field, self::FILTERABLE_FIELDS, true)) {
+			return null;
+		}
+
 		return $field;
+	}
+
+	private function normalizeScalarValues(array $values): array {
+		$normalized = [];
+		foreach ($values as $value) {
+			if (is_scalar($value)) {
+				$normalized[] = $value;
+				continue;
+			}
+
+			if (!is_array($value)) {
+				continue;
+			}
+
+			foreach ($value as $entry) {
+				if (is_scalar($entry)) {
+					$normalized[] = $entry;
+				}
+			}
+		}
+
+		return array_values($normalized);
+	}
+
+	private function buildKeywordSimpleQuery(string $field, array $values): string {
+		$clauses = [];
+		foreach ($values as $value) {
+			$clauses[] = "$field = '" . $this->escapeFilterValue((string)$value) . "'";
+		}
+
+		$clauses = array_values(array_unique($clauses));
+		if ($clauses === []) {
+			return '';
+		}
+
+		if (count($clauses) === 1) {
+			return $clauses[0];
+		}
+
+		return '(' . implode(' OR ', $clauses) . ')';
+	}
+
+	private function buildIntEqualitySimpleQuery(string $field, array $values): string {
+		$clauses = [];
+		foreach ($values as $value) {
+			$clauses[] = "$field = " . (int)$value;
+		}
+
+		$clauses = array_values(array_unique($clauses));
+		if (count($clauses) === 1) {
+			return $clauses[0];
+		}
+
+		return '(' . implode(' OR ', $clauses) . ')';
+	}
+
+	private function extractFirstNumericValue(array $values): ?int {
+		foreach ($values as $value) {
+			if (is_numeric($value)) {
+				return (int)$value;
+			}
+		}
+
+		return null;
+	}
+
+	private function normalizeBooleanValue(mixed $value): ?bool {
+		if (is_bool($value)) {
+			return $value;
+		}
+
+		if (is_int($value) || is_float($value)) {
+			if ((float)$value === 1.0) {
+				return true;
+			}
+			if ((float)$value === 0.0) {
+				return false;
+			}
+
+			return null;
+		}
+
+		if (!is_string($value)) {
+			return null;
+		}
+
+		$normalized = strtolower(trim($value));
+		if ($normalized === 'true' || $normalized === '1' || $normalized === 'yes') {
+			return true;
+		}
+
+		if ($normalized === 'false' || $normalized === '0' || $normalized === 'no') {
+			return false;
+		}
+
+		return null;
+	}
+
+	private function buildBooleanSimpleQuery(string $field, array $values): string {
+		$allowTrue = in_array(true, $values, true);
+		$allowFalse = in_array(false, $values, true);
+		if ($allowTrue && $allowFalse) {
+			return '';
+		}
+
+		return $field . ' = ' . ($allowTrue ? 'true' : 'false');
 	}
 }

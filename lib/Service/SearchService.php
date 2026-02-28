@@ -131,12 +131,9 @@ class SearchService {
 			}
 		}
 
-		if (!is_array($result)) {
-			if ($lastNotFound !== null) {
-				throw $lastNotFound;
-			}
-
-			$result = (array)$result;
+		$result = $this->extractRawDocumentResult($result);
+		if ($result === [] && $lastNotFound !== null) {
+			throw $lastNotFound;
 		}
 
 		$access = new DocumentAccess((string)($result['owner'] ?? ''));
@@ -317,6 +314,37 @@ class SearchService {
 			if (is_array($raw)) {
 				return $raw;
 			}
+		}
+
+		return [];
+	}
+
+	/**
+	 * @param mixed $result
+	 *
+	 * @return array
+	 */
+	private function extractRawDocumentResult(mixed $result): array {
+		if (is_array($result)) {
+			return $result;
+		}
+
+		if (is_object($result) && method_exists($result, 'getRaw')) {
+			$raw = $result->getRaw();
+			if (is_array($raw)) {
+				return $raw;
+			}
+		}
+
+		if (is_object($result) && method_exists($result, 'toArray')) {
+			$raw = $result->toArray();
+			if (is_array($raw)) {
+				return $raw;
+			}
+		}
+
+		if (is_object($result)) {
+			return (array)$result;
 		}
 
 		return [];
