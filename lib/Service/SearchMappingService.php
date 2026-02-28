@@ -133,11 +133,17 @@ class SearchMappingService {
 		$parts[] = "users = '__all'";
 
 		foreach ($access->getGroups() as $group) {
-			$parts[] = "groups = '" . $this->escapeFilterValue($group) . "'";
+			if (!is_scalar($group)) {
+				continue;
+			}
+			$parts[] = "groups = '" . $this->escapeFilterValue((string)$group) . "'";
 		}
 
 		foreach ($access->getCircles() as $circle) {
-			$parts[] = "circles = '" . $this->escapeFilterValue($circle) . "'";
+			if (!is_scalar($circle)) {
+				continue;
+			}
+			$parts[] = "circles = '" . $this->escapeFilterValue((string)$circle) . "'";
 		}
 
 		return implode(' OR ', $parts);
@@ -159,7 +165,10 @@ class SearchMappingService {
 
 		$parts = [];
 		foreach ($tags as $tag) {
-			$parts[] = "$field = '" . $this->escapeFilterValue($tag) . "'";
+			if (!is_scalar($tag)) {
+				continue;
+			}
+			$parts[] = "$field = '" . $this->escapeFilterValue((string)$tag) . "'";
 		}
 
 		return implode(' OR ', $parts);
@@ -181,7 +190,10 @@ class SearchMappingService {
 
 		$parts = [];
 		foreach ($tags as $tag) {
-			$parts[] = "$field = '" . $this->escapeFilterValue($tag) . "'";
+			if (!is_scalar($tag)) {
+				continue;
+			}
+			$parts[] = "$field = '" . $this->escapeFilterValue((string)$tag) . "'";
 		}
 
 		return implode(' AND ', $parts);
@@ -210,7 +222,9 @@ class SearchMappingService {
 
 			switch ($query->getType()) {
 				case ISearchRequestSimpleQuery::COMPARE_TYPE_KEYWORD:
-					$parts[] = "$field = '" . $this->escapeFilterValue((string)$value) . "'";
+					if (is_scalar($value)) {
+						$parts[] = "$field = '" . $this->escapeFilterValue((string)$value) . "'";
+					}
 					break;
 				case ISearchRequestSimpleQuery::COMPARE_TYPE_INT_EQ:
 					if (is_numeric($value)) {
@@ -255,10 +269,17 @@ class SearchMappingService {
 	private function getHighlightAttributes(ISearchRequest $request): array {
 		$attrs = ['content', 'title'];
 		foreach ($request->getParts() as $part) {
+			if (!is_scalar($part)) {
+				continue;
+			}
+			$part = trim((string)$part);
+			if ($part === '') {
+				continue;
+			}
 			$attrs[] = 'parts.' . $part;
 		}
 
-		return $attrs;
+		return array_values(array_unique($attrs));
 	}
 
 

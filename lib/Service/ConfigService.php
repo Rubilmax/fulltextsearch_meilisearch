@@ -68,6 +68,51 @@ class ConfigService {
 	}
 
 	public function checkConfig(array $data): bool {
+		foreach ($data as $key => $value) {
+			if (!in_array(
+				$key,
+				[
+					ConfigLexicon::MEILISEARCH_HOST,
+					ConfigLexicon::MEILISEARCH_INDEX,
+					ConfigLexicon::MEILISEARCH_API_KEY
+				],
+				true
+			)) {
+				return false;
+			}
+
+			if (!is_scalar($value)) {
+				return false;
+			}
+		}
+
+		if (array_key_exists(ConfigLexicon::MEILISEARCH_HOST, $data)) {
+			$host = trim((string)$data[ConfigLexicon::MEILISEARCH_HOST]);
+			if ($host !== '') {
+				$parts = parse_url($host);
+				if (!is_array($parts)) {
+					return false;
+				}
+
+				$scheme = strtolower((string)($parts['scheme'] ?? ''));
+				$allowedSchemes = ['http', 'https'];
+				if (!in_array($scheme, $allowedSchemes, true)) {
+					return false;
+				}
+
+				if (($parts['host'] ?? '') === '') {
+					return false;
+				}
+			}
+		}
+
+		if (array_key_exists(ConfigLexicon::MEILISEARCH_INDEX, $data)) {
+			$index = trim((string)$data[ConfigLexicon::MEILISEARCH_INDEX]);
+			if ($index !== '' && preg_match('/^[A-Za-z0-9_-]+$/', $index) !== 1) {
+				return false;
+			}
+		}
+
 		return true;
 	}
 }

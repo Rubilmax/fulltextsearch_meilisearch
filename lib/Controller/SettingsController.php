@@ -48,7 +48,7 @@ class SettingsController extends Controller {
 	 * @return DataResponse
 	 * @throws Exception
 	 */
-	public function setSettingsAdmin(array $data): DataResponse {
+	public function setSettingsAdmin(array $data = []): DataResponse {
 		if ($this->configService->checkConfig($data)) {
 			$this->configService->setConfig($data);
 		}
@@ -56,4 +56,3 @@ class SettingsController extends Controller {
 		return $this->getSettingsAdmin();
 	}
 }
-
