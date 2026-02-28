@@ -56,7 +56,11 @@ class IndexService {
 
 		try {
 			$client->getIndex($indexName);
-		} catch (ApiException) {
+		} catch (ApiException $e) {
+			if ((int)$e->getCode() !== 404) {
+				throw $e;
+			}
+
 			$creationTask = $client->createIndex($indexName, ['primaryKey' => 'id']);
 		}
 		$this->waitForTaskCompletion($client, $creationTask);
