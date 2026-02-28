@@ -321,6 +321,13 @@ class MeilisearchPlatform implements IFullTextSearchPlatform {
 			return;
 		}
 
+		$devOcpPath = dirname(__DIR__, 2) . '/vendor/nextcloud/ocp';
+		if (is_dir($devOcpPath)) {
+			throw new ClientException(
+				'Unsupported dev dependency detected (vendor/nextcloud/ocp). Reinstall this app with production dependencies only: composer install --no-dev'
+			);
+		}
+
 		$autoLoad = dirname(__DIR__, 2) . '/vendor/autoload.php';
 		if (file_exists($autoLoad)) {
 			include_once $autoLoad;
@@ -328,7 +335,7 @@ class MeilisearchPlatform implements IFullTextSearchPlatform {
 
 		if (!class_exists(Client::class)) {
 			throw new ClientException(
-				'Meilisearch client library not found. Please install app dependencies (composer install) or use a packaged release.'
+				'Meilisearch client library not found. Please install app dependencies (composer install --no-dev) or use a packaged release.'
 			);
 		}
 	}
