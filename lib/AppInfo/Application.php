@@ -14,6 +14,10 @@ use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 
+if (file_exists($autoLoad = __DIR__ . '/../../vendor/autoload.php')) {
+	include_once $autoLoad;
+}
+
 class Application extends App implements IBootstrap {
 	const APP_NAME = 'fulltextsearch_meilisearch';
 

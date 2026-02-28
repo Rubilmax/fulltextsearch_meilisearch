@@ -44,6 +44,8 @@ Install `fulltextsearch_meilisearch` from the Nextcloud App Store, or manually:
 ```bash
 cd /path/to/nextcloud/apps
 git clone https://github.com/nextcloud/fulltextsearch_meilisearch.git
+cd fulltextsearch_meilisearch
+composer install --no-dev
 ```
 
 Then enable it:
