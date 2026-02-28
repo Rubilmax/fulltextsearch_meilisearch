@@ -74,7 +74,7 @@ class QueryContent implements JsonSerializable {
 
 		if (substr($this->getWord(), 0, 1) === '"') {
 			$this->setMatch('match');
-			if (strpos($this->getWord(), " ") > -1) {
+			if (str_contains($this->getWord(), ' ')) {
 				$this->setMatch('match_phrase_prefix');
 			}
 		}
@@ -172,4 +172,3 @@ class QueryContent implements JsonSerializable {
 	}
 
 }
-

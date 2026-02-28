@@ -39,6 +39,10 @@ class ConfigService {
 						continue 2;
 					}
 
+					if ($k === ConfigLexicon::MEILISEARCH_HOST || $k === ConfigLexicon::MEILISEARCH_INDEX) {
+						$value = trim((string)$value);
+					}
+
 					$this->appConfig->setAppValueString($k, (string)$value);
 					break;
 			}
@@ -46,7 +50,7 @@ class ConfigService {
 	}
 
 	public function getMeilisearchIndex(): string {
-		$index = $this->appConfig->getAppValueString(ConfigLexicon::MEILISEARCH_INDEX);
+		$index = trim($this->appConfig->getAppValueString(ConfigLexicon::MEILISEARCH_INDEX));
 		if ($index === '') {
 			throw new ConfigurationException('Your MeilisearchPlatform is not configured properly');
 		}
@@ -55,7 +59,7 @@ class ConfigService {
 	}
 
 	public function getMeilisearchHost(): string {
-		$host = $this->appConfig->getAppValueString(ConfigLexicon::MEILISEARCH_HOST);
+		$host = trim($this->appConfig->getAppValueString(ConfigLexicon::MEILISEARCH_HOST));
 		if ($host === '') {
 			throw new ConfigurationException('Your MeilisearchPlatform is not configured properly');
 		}
