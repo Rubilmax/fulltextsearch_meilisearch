@@ -12,8 +12,8 @@ namespace OCA\FullTextSearch_Meilisearch\Command;
 use Exception;
 use OC\Core\Command\Base;
 use OCA\FullTextSearch_Meilisearch\Service\ConfigService;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Configure extends Base {
@@ -27,7 +27,7 @@ class Configure extends Base {
 	protected function configure() {
 		parent::configure();
 		$this->setName('fulltextsearch_meilisearch:configure')
-			 ->addArgument('json', InputArgument::OPTIONAL, 'set config')
+			 ->addOption('json', null, InputOption::VALUE_REQUIRED, 'set config as JSON string')
 			 ->setDescription('Configure the installation');
 	}
 
@@ -39,8 +39,8 @@ class Configure extends Base {
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output): int {
-		if ($input->getArgument('json')) {
-			$this->configService->setConfig(json_decode($input->getArgument('json') ?? '', true) ?? []);
+		if ($input->getOption('json')) {
+			$this->configService->setConfig(json_decode($input->getOption('json'), true) ?? []);
 		}
 
 		$output->writeln(json_encode($this->configService->getConfig(), JSON_PRETTY_PRINT));
