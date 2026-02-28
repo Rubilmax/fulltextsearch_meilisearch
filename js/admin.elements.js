@@ -14,6 +14,15 @@ var meilisearch_elements = {
 	meilisearch_index: null,
 	meilisearch_api_key: null,
 
+	tagAsNotSaved: function (element) {
+		if (typeof fts_admin_settings === 'undefined'
+			|| typeof fts_admin_settings.tagSettingsAsNotSaved !== 'function') {
+			return;
+		}
+
+		fts_admin_settings.tagSettingsAsNotSaved(element);
+	},
+
 
 	init: function () {
 		meilisearch_elements.meilisearch_div = $('#meilisearch');
@@ -22,21 +31,27 @@ var meilisearch_elements = {
 		meilisearch_elements.meilisearch_api_key = $('#meilisearch_api_key');
 
 		meilisearch_elements.meilisearch_host.on('input', function () {
-			fts_admin_settings.tagSettingsAsNotSaved($(this));
+			meilisearch_elements.tagAsNotSaved($(this));
 		}).blur(function () {
-			meilisearch_settings.saveSettings();
+			if (typeof meilisearch_settings.saveSettings === 'function') {
+				meilisearch_settings.saveSettings();
+			}
 		});
 
 		meilisearch_elements.meilisearch_index.on('input', function () {
-			fts_admin_settings.tagSettingsAsNotSaved($(this));
+			meilisearch_elements.tagAsNotSaved($(this));
 		}).blur(function () {
-			meilisearch_settings.saveSettings();
+			if (typeof meilisearch_settings.saveSettings === 'function') {
+				meilisearch_settings.saveSettings();
+			}
 		});
 
 		meilisearch_elements.meilisearch_api_key.on('input', function () {
-			fts_admin_settings.tagSettingsAsNotSaved($(this));
+			meilisearch_elements.tagAsNotSaved($(this));
 		}).blur(function () {
-			meilisearch_settings.saveSettings();
+			if (typeof meilisearch_settings.saveSettings === 'function') {
+				meilisearch_settings.saveSettings();
+			}
 		});
 	}
 

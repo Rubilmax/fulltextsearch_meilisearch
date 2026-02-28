@@ -99,6 +99,7 @@ class SearchService {
 	 *
 	 * @return IIndexDocument
 	 * @throws ConfigurationException
+	 * @throws ApiException
 	 */
 	public function getDocument(
 		Client $client,
@@ -107,21 +108,35 @@ class SearchService {
 	): IIndexDocument {
 		$index = $client->index($this->configService->getMeilisearchIndex());
 		$result = null;
+		$lastNotFound = null;
 		$docIds = IndexMappingService::getDocumentIdCandidates($providerId, $documentId);
-		foreach ($docIds as $docId) {
+		foreach ($docIds as $candidatePos => $docId) {
 			try {
 				$result = $index->getDocument($docId);
 				break;
 			} catch (ApiException $e) {
-				$isLastCandidate = ($docId === $docIds[array_key_last($docIds)]);
-				if ($isLastCandidate || $e->getCode() !== 404) {
-					throw $e;
+				$statusCode = (int)$e->getCode();
+				if ($statusCode === 404) {
+					$lastNotFound = $e;
+					continue;
 				}
+
+				// Ignore invalid-id errors on legacy fallback candidate and keep the primary error semantics.
+				$isLegacyFallbackCandidate = ($candidatePos > 0);
+				if ($isLegacyFallbackCandidate && ($statusCode === 400 || $statusCode === 422)) {
+					continue;
+				}
+
+				throw $e;
 			}
 		}
 
 		if (!is_array($result)) {
-			$result = [];
+			if ($lastNotFound !== null) {
+				throw $lastNotFound;
+			}
+
+			$result = (array)$result;
 		}
 
 		$access = new DocumentAccess((string)($result['owner'] ?? ''));

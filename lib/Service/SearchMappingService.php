@@ -39,13 +39,15 @@ class SearchMappingService {
 		string $providerId
 	): array {
 		$searchString = $request->getSearch();
+		$page = max(1, (int)$request->getPage());
+		$size = max(0, (int)$request->getSize());
 
 		$filter = $this->buildFilterExpression($request, $access, $providerId);
 
 		$params = [
 			'filter' => $filter,
-			'limit' => $request->getSize(),
-			'offset' => ($request->getPage() - 1) * $request->getSize(),
+			'limit' => $size,
+			'offset' => ($page - 1) * $size,
 			'attributesToHighlight' => $this->getHighlightAttributes($request),
 			'highlightPreTag' => '',
 			'highlightPostTag' => '',

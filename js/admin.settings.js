@@ -15,6 +15,9 @@ var meilisearch_settings = {
 	config: null,
 
 	refreshSettingPage: function () {
+		if (typeof OC === 'undefined' || typeof OC.generateUrl !== 'function') {
+			return;
+		}
 
 		$.ajax({
 			method: 'GET',
@@ -29,16 +32,35 @@ var meilisearch_settings = {
 	/** @namespace result.meilisearch_index */
 	/** @namespace result.meilisearch_api_key */
 	updateSettingPage: function (result) {
+		if (!result || typeof result !== 'object') {
+			return;
+		}
+		if (!meilisearch_elements.meilisearch_host
+			|| !meilisearch_elements.meilisearch_index
+			|| !meilisearch_elements.meilisearch_api_key) {
+			return;
+		}
 
 		meilisearch_elements.meilisearch_host.val(result.meilisearch_host);
 		meilisearch_elements.meilisearch_index.val(result.meilisearch_index);
 		meilisearch_elements.meilisearch_api_key.val(result.meilisearch_api_key);
 
-		fts_admin_settings.tagSettingsAsSaved(meilisearch_elements.meilisearch_div);
+		if (typeof fts_admin_settings !== 'undefined'
+			&& typeof fts_admin_settings.tagSettingsAsSaved === 'function') {
+			fts_admin_settings.tagSettingsAsSaved(meilisearch_elements.meilisearch_div);
+		}
 	},
 
 
 	saveSettings: function () {
+		if (typeof OC === 'undefined' || typeof OC.generateUrl !== 'function') {
+			return;
+		}
+		if (!meilisearch_elements.meilisearch_host
+			|| !meilisearch_elements.meilisearch_index
+			|| !meilisearch_elements.meilisearch_api_key) {
+			return;
+		}
 
 		var data = {
 			meilisearch_host: meilisearch_elements.meilisearch_host.val(),
