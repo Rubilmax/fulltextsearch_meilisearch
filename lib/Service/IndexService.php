@@ -52,12 +52,14 @@ class IndexService {
 	 */
 	public function initializeIndex(Client $client): void {
 		$indexName = $this->indexMappingService->getIndexName();
+		$creationTask = [];
 
 		try {
 			$client->getIndex($indexName);
 		} catch (ApiException) {
-			$client->createIndex($indexName, ['primaryKey' => 'id']);
+			$creationTask = $client->createIndex($indexName, ['primaryKey' => 'id']);
 		}
+		$this->waitForTaskCompletion($client, $creationTask);
 
 		$this->indexMappingService->configureIndexSettings($client);
 	}
@@ -164,5 +166,18 @@ class IndexService {
 
 	private function escapeFilterValue(string $value): string {
 		return str_replace(['\\', "'"], ['\\\\', "\\'"], $value);
+	}
+
+	private function waitForTaskCompletion(Client $client, array $task): void {
+		if ($task === []) {
+			return;
+		}
+
+		$taskUid = $task['taskUid'] ?? $task['uid'] ?? null;
+		if (!is_scalar($taskUid) || !is_numeric((string)$taskUid)) {
+			return;
+		}
+
+		$client->waitForTask((int)$taskUid, 30000, 100);
 	}
 }
