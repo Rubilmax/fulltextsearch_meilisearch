@@ -9,6 +9,12 @@
 
 
 $(document).ready(function () {
+	if (typeof OCA === 'undefined'
+		|| typeof OCA.FullTextSearchAdmin === 'undefined'
+		|| typeof meilisearch_elements === 'undefined'
+		|| typeof meilisearch_settings === 'undefined') {
+		return;
+	}
 
 
 	/**

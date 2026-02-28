@@ -14,6 +14,7 @@ use OCA\FullTextSearch_Meilisearch\AppInfo\Application;
 use OCA\FullTextSearch_Meilisearch\Service\ConfigService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\AdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 
@@ -36,6 +37,7 @@ class SettingsController extends Controller {
 	 * @return DataResponse
 	 * @throws Exception
 	 */
+	#[AdminRequired]
 	public function getSettingsAdmin(): DataResponse {
 		$data = $this->configService->getConfig();
 
@@ -48,6 +50,7 @@ class SettingsController extends Controller {
 	 * @return DataResponse
 	 * @throws Exception
 	 */
+	#[AdminRequired]
 	public function setSettingsAdmin(array $data = []): DataResponse {
 		if ($this->configService->checkConfig($data)) {
 			$this->configService->setConfig($data);

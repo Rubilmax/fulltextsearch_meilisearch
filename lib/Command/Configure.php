@@ -54,6 +54,11 @@ class Configure extends Base {
 		}
 
 		if (!empty($config)) {
+			if (!$this->configService->checkConfig($config)) {
+				$output->writeln('<error>Invalid Meilisearch configuration values provided.</error>');
+				return self::FAILURE;
+			}
+
 			$this->configService->setConfig($config);
 		}
 
