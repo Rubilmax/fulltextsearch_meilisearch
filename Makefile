@@ -73,8 +73,7 @@ clean:
 
 # composer packages
 composer:
-	composer install --prefer-dist
-	composer upgrade --prefer-dist
+	composer install --no-dev --prefer-dist --classmap-authoritative
 
 appstore: clean composer
 	mkdir -p $(sign_dir)
