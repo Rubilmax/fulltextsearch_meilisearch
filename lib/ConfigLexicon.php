@@ -12,6 +12,7 @@ use OCP\Config\Lexicon\Entry;
 use OCP\Config\Lexicon\ILexicon;
 use OCP\Config\Lexicon\Strictness;
 use OCP\Config\ValueType;
+use OCP\IAppConfig;
 
 class ConfigLexicon implements ILexicon {
 	public const MEILISEARCH_HOST = 'meilisearch_host';
@@ -26,7 +27,7 @@ class ConfigLexicon implements ILexicon {
 		return [
 			new Entry(key: self::MEILISEARCH_HOST, type: ValueType::STRING, defaultRaw: '', definition: 'Address of the Meilisearch server', lazy: true),
 			new Entry(key: self::MEILISEARCH_INDEX, type: ValueType::STRING, defaultRaw: '', definition: 'Name of the index on Meilisearch', lazy: true),
-			new Entry(key: self::MEILISEARCH_API_KEY, type: ValueType::STRING, defaultRaw: '', definition: 'API key for Meilisearch authentication', lazy: true, sensitive: true),
+			new Entry(key: self::MEILISEARCH_API_KEY, type: ValueType::STRING, defaultRaw: '', definition: 'API key for Meilisearch authentication', lazy: true, flags: IAppConfig::FLAG_SENSITIVE),
 		];
 	}
 
