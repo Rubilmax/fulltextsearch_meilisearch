@@ -65,7 +65,7 @@ Go to **Settings > Administration > Full text search** and fill in:
 #### Via the Command Line
 
 ```bash
-occ fulltextsearch_meilisearch:configure --json '{"meilisearch_host":"http://localhost:7700","meilisearch_index":"nextcloud","meilisearch_api_key":"YOUR_MASTER_KEY"}'
+occ fulltextsearch_meilisearch:configure --host http://localhost:7700 --index nextcloud --api-key YOUR_MASTER_KEY
 ```
 
 ### 4. Run the Initial Index

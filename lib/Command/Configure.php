@@ -11,6 +11,7 @@ namespace OCA\FullTextSearch_Meilisearch\Command;
 
 use Exception;
 use OC\Core\Command\Base;
+use OCA\FullTextSearch_Meilisearch\ConfigLexicon;
 use OCA\FullTextSearch_Meilisearch\Service\ConfigService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -27,7 +28,9 @@ class Configure extends Base {
 	protected function configure() {
 		parent::configure();
 		$this->setName('fulltextsearch_meilisearch:configure')
-			 ->addOption('json', null, InputOption::VALUE_REQUIRED, 'set config as JSON string')
+			 ->addOption('host', null, InputOption::VALUE_REQUIRED, 'Address of the Meilisearch server')
+			 ->addOption('index', null, InputOption::VALUE_REQUIRED, 'Name of the index on Meilisearch')
+			 ->addOption('api-key', null, InputOption::VALUE_REQUIRED, 'API key for Meilisearch authentication')
 			 ->setDescription('Configure the installation');
 	}
 
@@ -39,12 +42,22 @@ class Configure extends Base {
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output): int {
-		if ($input->getOption('json')) {
-			$this->configService->setConfig(json_decode($input->getOption('json'), true) ?? []);
+		$config = [];
+		if ($input->getOption('host') !== null) {
+			$config[ConfigLexicon::MEILISEARCH_HOST] = $input->getOption('host');
+		}
+		if ($input->getOption('index') !== null) {
+			$config[ConfigLexicon::MEILISEARCH_INDEX] = $input->getOption('index');
+		}
+		if ($input->getOption('api-key') !== null) {
+			$config[ConfigLexicon::MEILISEARCH_API_KEY] = $input->getOption('api-key');
+		}
+
+		if (!empty($config)) {
+			$this->configService->setConfig($config);
 		}
 
 		$output->writeln(json_encode($this->configService->getConfig(), JSON_PRETTY_PRINT));
 		return self::SUCCESS;
 	}
 }
-
