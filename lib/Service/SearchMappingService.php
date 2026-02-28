@@ -196,7 +196,11 @@ class SearchMappingService {
 	private function buildSimpleQueryFilter(array $queries): string {
 		$parts = [];
 		foreach ($queries as $query) {
-			$field = $query->getField();
+			$field = $this->sanitizeFilterField($query->getField());
+			if ($field === null) {
+				continue;
+			}
+
 			$values = $query->getValues();
 			if ($values === []) {
 				continue;
@@ -264,6 +268,19 @@ class SearchMappingService {
 	 * @return string
 	 */
 	private function escapeFilterValue(string $value): string {
-		return str_replace("'", "\\'", $value);
+		return str_replace(['\\', "'"], ['\\\\', "\\'"], $value);
+	}
+
+	private function sanitizeFilterField(string $field): ?string {
+		$field = trim($field);
+		if ($field === '') {
+			return null;
+		}
+
+		if (preg_match('/^[A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+)*$/', $field) !== 1) {
+			return null;
+		}
+
+		return $field;
 	}
 }

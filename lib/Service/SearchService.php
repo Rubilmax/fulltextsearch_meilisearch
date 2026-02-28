@@ -212,14 +212,46 @@ class SearchService {
 	 */
 	private function parseSearchEntryExcerpts(array $formatted): array {
 		$result = [];
+		$seen = [];
 		$fields = ['content', 'title'];
 		foreach ($fields as $field) {
-			if (isset($formatted[$field]) && $formatted[$field] !== '') {
+			if (isset($formatted[$field]) && is_string($formatted[$field]) && $formatted[$field] !== '') {
 				$result[] = [
 					'source' => $field,
 					'excerpt' => $formatted[$field]
 				];
+				$seen[$field] = true;
 			}
+		}
+
+		$parts = $formatted['parts'] ?? [];
+		if (is_array($parts)) {
+			foreach ($parts as $part => $excerpt) {
+				if (!is_string($part) || !is_string($excerpt) || $excerpt === '') {
+					continue;
+				}
+
+				$source = 'parts.' . $part;
+				$result[] = [
+					'source' => $source,
+					'excerpt' => $excerpt
+				];
+				$seen[$source] = true;
+			}
+		}
+
+		foreach ($formatted as $field => $excerpt) {
+			if (!is_string($field) || !str_starts_with($field, 'parts.')) {
+				continue;
+			}
+			if (!is_string($excerpt) || $excerpt === '' || isset($seen[$field])) {
+				continue;
+			}
+
+			$result[] = [
+				'source' => $field,
+				'excerpt' => $excerpt
+			];
 		}
 
 		return $result;

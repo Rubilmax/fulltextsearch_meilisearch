@@ -17,6 +17,8 @@ use OCP\FullTextSearch\Model\IIndexDocument;
 
 
 class IndexMappingService {
+	private const LEGACY_ID_SEPARATOR = '_-_';
+	private const ESCAPED_ID_PREFIX = 'h_';
 
 	public function __construct(
 		private ConfigService $configService,
@@ -29,7 +31,11 @@ class IndexMappingService {
 	 * Meilisearch requires alphanumeric IDs (plus - and _).
 	 */
 	public static function encodeDocumentId(string $providerId, string $documentId): string {
-		return str_replace(':', '_-_', $providerId . ':' . $documentId);
+		if (self::requiresEscapedId($providerId, $documentId)) {
+			return self::encodeEscapedDocumentId($providerId, $documentId);
+		}
+
+		return self::encodeLegacyDocumentId($providerId, $documentId);
 	}
 
 
@@ -37,13 +43,84 @@ class IndexMappingService {
 	 * Decode a Meilisearch document ID back to [providerId, documentId].
 	 */
 	public static function decodeDocumentId(string $encodedId): array {
-		$decoded = str_replace('_-_', ':', $encodedId);
+		$decodedEscaped = self::decodeEscapedDocumentId($encodedId);
+		if ($decodedEscaped !== null) {
+			return $decodedEscaped;
+		}
+
+		$decoded = str_replace(self::LEGACY_ID_SEPARATOR, ':', $encodedId);
 		$parts = explode(':', $decoded, 2);
 		if (count($parts) < 2) {
 			return [$parts[0] ?? '', ''];
 		}
 
 		return [$parts[0], $parts[1]];
+	}
+
+	/**
+	 * Legacy encoding used before collision-safe IDs were introduced.
+	 */
+	private static function encodeLegacyDocumentId(string $providerId, string $documentId): string {
+		return str_replace(':', self::LEGACY_ID_SEPARATOR, $providerId . ':' . $documentId);
+	}
+
+	/**
+	 * Collision-safe encoding for IDs that cannot be represented safely with legacy encoding.
+	 */
+	private static function encodeEscapedDocumentId(string $providerId, string $documentId): string {
+		return self::ESCAPED_ID_PREFIX . bin2hex($providerId) . '_' . bin2hex($documentId);
+	}
+
+	private static function requiresEscapedId(string $providerId, string $documentId): bool {
+		if (str_contains($providerId, self::LEGACY_ID_SEPARATOR) || str_contains($documentId, self::LEGACY_ID_SEPARATOR)) {
+			return true;
+		}
+
+		return (
+			preg_match('/^[A-Za-z0-9_:-]+$/', $providerId) !== 1
+			|| preg_match('/^[A-Za-z0-9_:-]+$/', $documentId) !== 1
+		);
+	}
+
+	/**
+	 * Decode collision-safe IDs. Returns null when the format is not matched.
+	 */
+	private static function decodeEscapedDocumentId(string $encodedId): ?array {
+		if (!str_starts_with($encodedId, self::ESCAPED_ID_PREFIX)) {
+			return null;
+		}
+
+		$payload = substr($encodedId, strlen(self::ESCAPED_ID_PREFIX));
+		$separatorPos = strpos($payload, '_');
+		if ($separatorPos === false) {
+			return null;
+		}
+
+		$providerHex = substr($payload, 0, $separatorPos);
+		$documentHex = substr($payload, $separatorPos + 1);
+		if (!self::isHexData($providerHex) || !self::isHexData($documentHex)) {
+			return null;
+		}
+
+		$providerId = ($providerHex === '') ? '' : hex2bin($providerHex);
+		$documentId = ($documentHex === '') ? '' : hex2bin($documentHex);
+		if ($providerId === false || $documentId === false) {
+			return null;
+		}
+
+		return [$providerId, $documentId];
+	}
+
+	private static function isHexData(string $value): bool {
+		if ($value === '') {
+			return true;
+		}
+
+		if (strlen($value) % 2 !== 0) {
+			return false;
+		}
+
+		return preg_match('/^[a-f0-9]+$/', $value) === 1;
 	}
 
 
@@ -99,7 +176,7 @@ class IndexMappingService {
 
 		$result = $index->addDocuments([$body]);
 
-		return $result->toArray();
+		return (array) $result;
 	}
 
 
@@ -119,7 +196,7 @@ class IndexMappingService {
 
 		$result = $index->updateDocuments([$body]);
 
-		return $result->toArray();
+		return (array) $result;
 	}
 
 
@@ -132,11 +209,16 @@ class IndexMappingService {
 	 */
 	public function indexDocumentRemove(Client $client, string $providerId, string $documentId): void {
 		$index = $client->index($this->configService->getMeilisearchIndex());
-		$docId = self::encodeDocumentId($providerId, $documentId);
+		$docIds = array_unique([
+			self::encodeDocumentId($providerId, $documentId),
+			self::encodeLegacyDocumentId($providerId, $documentId),
+		]);
 
-		try {
-			$index->deleteDocument($docId);
-		} catch (ApiException) {
+		foreach ($docIds as $docId) {
+			try {
+				$index->deleteDocument($docId);
+			} catch (ApiException) {
+			}
 		}
 	}
 

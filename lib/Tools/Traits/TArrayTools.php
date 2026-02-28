@@ -123,7 +123,7 @@ trait TArrayTools {
 			return $default;
 		}
 
-		return intval($arr[$k]);
+		return (float)$arr[$k];
 	}
 
 
