@@ -83,6 +83,8 @@ class MeilisearchPlatform implements IFullTextSearchPlatform {
 	 * @throws ConfigurationException
 	 */
 	public function loadPlatform() {
+		$this->loadClientLibrary();
+
 		$host = $this->configService->getMeilisearchHost();
 		$apiKey = $this->configService->getMeilisearchApiKey();
 		$this->client = new Client($host, $apiKey);
@@ -312,5 +314,22 @@ class MeilisearchPlatform implements IFullTextSearchPlatform {
 		}
 
 		return $this->client;
+	}
+
+	private function loadClientLibrary(): void {
+		if (class_exists(Client::class)) {
+			return;
+		}
+
+		$autoLoad = dirname(__DIR__, 2) . '/vendor/autoload.php';
+		if (file_exists($autoLoad)) {
+			include_once $autoLoad;
+		}
+
+		if (!class_exists(Client::class)) {
+			throw new ClientException(
+				'Meilisearch client library not found. Please install app dependencies (composer install) or use a packaged release.'
+			);
+		}
 	}
 }

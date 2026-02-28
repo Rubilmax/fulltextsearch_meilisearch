@@ -144,9 +144,10 @@ class IndexService {
 		$index->setLastIndex();
 
 		if (array_key_exists('exception', $result)) {
+			$exceptionMessage = (string)($result['exception'] ?? 'indexing exception');
 			$index->setStatus(IIndex::INDEX_FAILED);
 			$index->addError(
-				$this->get('message', $result, $result['exception']),
+				$this->get('message', $result, $exceptionMessage),
 				'',
 				IIndex::ERROR_SEV_3
 			);
