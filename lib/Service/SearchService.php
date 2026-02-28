@@ -74,7 +74,16 @@ class SearchService {
 		$this->logger->debug('result from Meilisearch', ['result' => $raw]);
 		$this->updateSearchResult($searchResult, $raw);
 
-		foreach ($raw['hits'] as $entry) {
+		$hits = $raw['hits'] ?? [];
+		if (!is_array($hits)) {
+			$hits = [];
+		}
+
+		foreach ($hits as $entry) {
+			if (!is_array($entry) || !array_key_exists('id', $entry)) {
+				continue;
+			}
+
 			$searchResult->addDocument($this->parseSearchEntry($entry, $access->getViewerId()));
 		}
 
@@ -99,22 +108,22 @@ class SearchService {
 		$index = $client->index($this->configService->getMeilisearchIndex());
 		$result = $index->getDocument($docId);
 
-		$access = new DocumentAccess($result['owner']);
-		$access->setUsers($result['users']);
-		$access->setGroups($result['groups']);
-		$access->setCircles($result['circles']);
-		$access->setLinks($result['links']);
+		$access = new DocumentAccess((string)($result['owner'] ?? ''));
+		$access->setUsers((array)($result['users'] ?? []));
+		$access->setGroups((array)($result['groups'] ?? []));
+		$access->setCircles((array)($result['circles'] ?? []));
+		$access->setLinks((array)($result['links'] ?? []));
 
 		$doc = new IndexDocument($providerId, $documentId);
 		$doc->setAccess($access);
-		$doc->setMetaTags($result['metatags']);
-		$doc->setSubTags($result['subtags']);
-		$doc->setTags($result['tags']);
-		$doc->setHash($result['hash']);
+		$doc->setMetaTags((array)($result['metatags'] ?? []));
+		$doc->setSubTags((array)($result['subtags'] ?? []));
+		$doc->setTags((array)($result['tags'] ?? []));
+		$doc->setHash((string)($result['hash'] ?? ''));
 		$doc->setModifiedTime($result['lastModified'] ?? 0);
-		$doc->setSource($result['source']);
-		$doc->setTitle($result['title']);
-		$doc->setParts($result['parts']);
+		$doc->setSource((string)($result['source'] ?? ''));
+		$doc->setTitle((string)($result['title'] ?? ''));
+		$doc->setParts((array)($result['parts'] ?? []));
 
 		$this->getDocumentInfos($doc, $result);
 
@@ -161,7 +170,7 @@ class SearchService {
 	 * @param array $result
 	 */
 	private function updateSearchResult(ISearchResult $searchResult, array $result): void {
-		$searchResult->setRawResult(json_encode($result));
+		$searchResult->setRawResult($this->encodeJson($result));
 		$searchResult->setTotal($result['estimatedTotalHits'] ?? $result['totalHits'] ?? 0);
 		$searchResult->setMaxScore(0);
 		$searchResult->setTime($result['processingTimeMs'] ?? 0);
@@ -179,7 +188,7 @@ class SearchService {
 		$access = new DocumentAccess();
 		$access->setViewerId($viewerId);
 
-		[$providerId, $documentId] = IndexMappingService::decodeDocumentId($entry['id']);
+		[$providerId, $documentId] = IndexMappingService::decodeDocumentId((string)$entry['id']);
 		$document = new IndexDocument($providerId, $documentId);
 		$document->setAccess($access);
 		$document->setHash($this->get('hash', $entry));
@@ -214,5 +223,19 @@ class SearchService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * @param array $data
+	 *
+	 * @return string
+	 */
+	private function encodeJson(array $data): string {
+		$json = json_encode($data, JSON_INVALID_UTF8_SUBSTITUTE);
+		if ($json === false) {
+			return '{}';
+		}
+
+		return $json;
 	}
 }

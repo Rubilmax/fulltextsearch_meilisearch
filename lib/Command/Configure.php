@@ -40,11 +40,14 @@ class Configure extends Base {
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		if ($input->getArgument('json')) {
-			$this->configService->setConfig(json_decode($input->getArgument('json') ?? '', true) ?? []);
+			$decoded = json_decode((string)$input->getArgument('json'), true);
+			if (is_array($decoded)) {
+				$this->configService->setConfig($decoded);
+			}
 		}
 
-		$output->writeln(json_encode($this->configService->getConfig(), JSON_PRETTY_PRINT));
+		$json = json_encode($this->configService->getConfig(), JSON_PRETTY_PRINT | JSON_INVALID_UTF8_SUBSTITUTE);
+		$output->writeln(($json === false) ? '{}' : $json);
 		return self::SUCCESS;
 	}
 }
-

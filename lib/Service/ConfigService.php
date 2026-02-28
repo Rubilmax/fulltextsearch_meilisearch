@@ -34,7 +34,12 @@ class ConfigService {
 				case ConfigLexicon::MEILISEARCH_HOST:
 				case ConfigLexicon::MEILISEARCH_INDEX:
 				case ConfigLexicon::MEILISEARCH_API_KEY:
-					$this->appConfig->setAppValueString($k, $save[$k]);
+					$value = $save[$k];
+					if (!is_scalar($value)) {
+						continue 2;
+					}
+
+					$this->appConfig->setAppValueString($k, (string)$value);
 					break;
 			}
 		}
