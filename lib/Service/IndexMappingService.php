@@ -272,13 +272,38 @@ class IndexMappingService {
 			if ($decoded === false) {
 				$decoded = base64_decode(strtr($content, '-_', '+/'), true);
 			}
-			$content = ($decoded !== false && mb_check_encoding($decoded, 'UTF-8'))
-				? $decoded
-				: '';
+			if ($decoded !== false && mb_check_encoding($decoded, 'UTF-8')) {
+				$content = $decoded;
+			} elseif ($decoded !== false && str_starts_with($decoded, '%PDF')) {
+				$content = $this->extractTextFromPdf($decoded);
+			} else {
+				$content = '';
+			}
 		}
 		$body['content'] = $content;
 
 		return array_merge($document->getInfoAll(), $body);
+	}
+
+	/**
+	 * Extract plain text from a PDF binary using pdftotext (poppler-utils).
+	 */
+	private function extractTextFromPdf(string $pdfBinary): string {
+		$tmpFile = tempnam(sys_get_temp_dir(), 'fts_pdf_');
+		if ($tmpFile === false) {
+			return '';
+		}
+
+		try {
+			file_put_contents($tmpFile, $pdfBinary);
+			$output = [];
+			$exitCode = 0;
+			exec('pdftotext ' . escapeshellarg($tmpFile) . ' -', $output, $exitCode);
+
+			return $exitCode === 0 ? implode("\n", $output) : '';
+		} finally {
+			@unlink($tmpFile);
+		}
 	}
 
 	private function waitForTaskCompletion(Client $client, mixed $task): void {
