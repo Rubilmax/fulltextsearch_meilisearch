@@ -10,6 +10,7 @@ namespace OCA\FullTextSearch_Meilisearch\Platform;
 
 
 use Exception;
+use GuzzleHttp\Client as GuzzleClient;
 use Meilisearch\Client;
 use Meilisearch\Exceptions\CommunicationException;
 use OCA\FullTextSearch_Meilisearch\ConfigLexicon;
@@ -26,6 +27,7 @@ use OCP\FullTextSearch\Model\IIndex;
 use OCP\FullTextSearch\Model\IIndexDocument;
 use OCP\FullTextSearch\Model\IRunner;
 use OCP\FullTextSearch\Model\ISearchResult;
+use OCP\ICertificateManager;
 use Psr\Log\LoggerInterface;
 
 
@@ -39,6 +41,7 @@ class MeilisearchPlatform implements IFullTextSearchPlatform {
 		private ConfigService $configService,
 		private IndexService $indexService,
 		private SearchService $searchService,
+		private ICertificateManager $certificateManager,
 		private LoggerInterface $logger,
 	) {
 	}
@@ -87,7 +90,11 @@ class MeilisearchPlatform implements IFullTextSearchPlatform {
 
 		$host = $this->configService->getMeilisearchHost();
 		$apiKey = $this->configService->getMeilisearchApiKey();
-		$this->client = new Client($host, $apiKey);
+		$httpClient = new GuzzleClient([
+			'verify' => $this->certificateManager->getAbsoluteBundlePath(),
+		]);
+
+		$this->client = new Client($host, $apiKey, $httpClient);
 	}
 
 
@@ -317,7 +324,7 @@ class MeilisearchPlatform implements IFullTextSearchPlatform {
 	}
 
 	private function loadClientLibrary(): void {
-		if (class_exists(Client::class)) {
+		if (class_exists(Client::class) && class_exists(GuzzleClient::class)) {
 			return;
 		}
 
@@ -326,9 +333,9 @@ class MeilisearchPlatform implements IFullTextSearchPlatform {
 			include_once $autoLoad;
 		}
 
-		if (!class_exists(Client::class)) {
+		if (!class_exists(Client::class) || !class_exists(GuzzleClient::class)) {
 			throw new ClientException(
-				'Meilisearch client library not found. Please install app dependencies (composer install) or use a packaged release.'
+				'Meilisearch client dependencies not found. Please install app dependencies (composer install) or use a packaged release.'
 			);
 		}
 	}
