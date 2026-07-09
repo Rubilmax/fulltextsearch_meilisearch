@@ -1,5 +1,5 @@
 OC.L10N.register(
-    "fulltextsearch_elasticsearch",
+    "fulltextsearch_meilisearch",
     {
     "Full text search - Elasticsearch Platform" : "Контекстний пошук - платформа Meilisearch",
     "Index using ElasticSearch" : "Індекс у Meilisearch",
