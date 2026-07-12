@@ -4,6 +4,11 @@
 -->
 # Changelog
 
+### 34.0.0
+
+- compat nc34
+- use a high Nextcloud max-version cap so future major upgrades are not blocked by default
+
 ### 32.0.0
 
 - BREAKING CHANGE: replace Elasticsearch backend with Meilisearch
@@ -205,4 +210,3 @@ First stable release
 ### BETA v0.3.0
 
 - First Beta
-
