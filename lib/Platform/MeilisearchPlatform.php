@@ -20,7 +20,6 @@ use OCA\FullTextSearch_Meilisearch\Service\ConfigService;
 use OCA\FullTextSearch_Meilisearch\Service\IndexService;
 use OCA\FullTextSearch_Meilisearch\Service\SearchService;
 use OCP\AppFramework\Services\IAppConfig;
-use OCP\FullTextSearch\Exceptions\PlatformTemporaryException;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
 use OCP\FullTextSearch\Model\IDocumentAccess;
 use OCP\FullTextSearch\Model\IIndex;
@@ -151,8 +150,8 @@ class MeilisearchPlatform implements IFullTextSearchPlatform {
 			);
 
 			return $index;
-		} catch (CommunicationException) {
-			throw new PlatformTemporaryException();
+		} catch (CommunicationException $e) {
+			$this->throwPlatformTemporaryException($e);
 		} catch (Exception $e) {
 			$indexingException = $e;
 			$this->manageIndexErrorException($document, $e);
@@ -172,6 +171,8 @@ class MeilisearchPlatform implements IFullTextSearchPlatform {
 			);
 
 			return $index;
+		} catch (CommunicationException $e) {
+			$this->throwPlatformTemporaryException($e);
 		} catch (Exception $e) {
 			$this->updateNewIndexResult(
 				$document->getIndex(), '', 'fail',
@@ -196,6 +197,25 @@ class MeilisearchPlatform implements IFullTextSearchPlatform {
 		$document->setContent('');
 
 		return $this->indexService->indexDocument($this->getClient(), $document);
+	}
+
+
+	/**
+	 * @throws Exception
+	 */
+	private function throwPlatformTemporaryException(CommunicationException $e): void {
+		foreach (
+			[
+				'OCA\\FullTextSearch\\Exceptions\\PlatformTemporaryException',
+				'OCP\\FullTextSearch\\Exceptions\\PlatformTemporaryException',
+			] as $exceptionClass
+		) {
+			if (class_exists($exceptionClass) && is_subclass_of($exceptionClass, Exception::class)) {
+				throw new $exceptionClass($e->getMessage(), (int)$e->getCode(), $e);
+			}
+		}
+
+		throw $e;
 	}
 
 

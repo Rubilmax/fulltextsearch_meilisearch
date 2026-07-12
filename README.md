@@ -4,7 +4,7 @@
 -->
 # Full text search - Meilisearch
 
-_Full text search - Meilisearch_ is an extension to the [Full text search](https://github.com/nextcloud/fulltextsearch) framework for Nextcloud.
+_Full text search - Meilisearch_ is an extension to the [Full text search](https://github.com/rubilmax/fulltextsearch) framework for Nextcloud.
 
 It allows you to index your content into a Meilisearch instance.
 
@@ -12,9 +12,9 @@ It allows you to index your content into a Meilisearch instance.
 
 ### Prerequisites
 
-- Nextcloud 32 or later
+- Nextcloud 34 or later
 - A running [Meilisearch](https://www.meilisearch.com/) instance (v1.0+)
-- The [Full text search](https://apps.nextcloud.com/apps/fulltextsearch) app installed and enabled on your Nextcloud instance
+- The [`rubilmax/fulltextsearch`](https://github.com/rubilmax/fulltextsearch) fork installed and enabled on your Nextcloud instance as the `fulltextsearch` app
 
 ### 1. Install Meilisearch
 
@@ -37,7 +37,24 @@ curl -L https://install.meilisearch.com | sh
 ./meilisearch --master-key="YOUR_MASTER_KEY"
 ```
 
-### 2. Install the App
+### 2. Install the Full Text Search Fork
+
+This platform app depends on the `fulltextsearch` Nextcloud app. Use the `rubilmax/fulltextsearch` fork and keep the checkout directory named `fulltextsearch`, because Nextcloud uses that app ID when loading the framework and commands.
+
+```bash
+cd /path/to/nextcloud/apps
+git clone https://github.com/rubilmax/fulltextsearch.git fulltextsearch
+cd fulltextsearch
+composer install --no-dev
+```
+
+Then enable it:
+
+```bash
+occ app:enable fulltextsearch
+```
+
+### 3. Install the Meilisearch Platform App
 
 Install `fulltextsearch_meilisearch` from the Nextcloud App Store, or manually:
 
@@ -54,7 +71,7 @@ Then enable it:
 occ app:enable fulltextsearch_meilisearch
 ```
 
-### 3. Configure the App
+### 4. Configure the App
 
 #### Via the Admin UI
 
@@ -70,7 +87,7 @@ Go to **Settings > Administration > Full text search** and fill in:
 occ fulltextsearch_meilisearch:configure --host http://localhost:7700 --index nextcloud --api-key YOUR_MASTER_KEY
 ```
 
-### 4. Run the Initial Index
+### 5. Run the Initial Index
 
 ```bash
 occ fulltextsearch:index
@@ -78,7 +95,7 @@ occ fulltextsearch:index
 
 This will index all content from enabled full text search providers (e.g., files, bookmarks) into your Meilisearch instance.
 
-### 5. Verify
+### 6. Verify
 
 Run a test search to confirm everything is working:
 
@@ -92,11 +109,13 @@ occ fulltextsearch:search "test query"
 
 **What it means**: Meilisearch does not have an equivalent to Elasticsearch's ingest pipeline with the attachment processor. This means binary file content (PDFs, DOCX, XLSX, PPTX, etc.) encoded as base64 cannot be processed and extracted by Meilisearch itself.
 
-**Impact**: Documents whose content is provided as base64-encoded binary data will be indexed with empty content. The document metadata (title, tags, access permissions) will still be indexed and searchable, but the body text of binary files will not be searchable unless it is extracted upstream.
+**Impact**: Documents whose content is provided as base64-encoded binary data will generally be indexed with empty content. The document metadata (title, tags, access permissions) will still be indexed and searchable, but the body text of binary files will not be searchable unless it is extracted upstream.
+
+PDF content is the only built-in exception: if the platform receives base64-encoded PDF data and the local `pdftotext` command is available, it will extract text before indexing. If `pdftotext` is unavailable or PHP command execution is disabled, PDF content is indexed as empty content like other binary formats.
 
 **Workarounds**:
 - Ensure the full text search content provider (e.g., `fulltextsearch_files`) extracts plain text from files before sending them to the platform. Many providers already do this.
-- Use external tools like [Apache Tika](https://tika.apache.org/) or [pdftotext](https://poppler.freedesktop.org/) to pre-process files and provide plain-text content to the indexing pipeline.
+- Use external tools like [Apache Tika](https://tika.apache.org/) or [pdftotext](https://poppler.freedesktop.org/) to provide plain-text content to the indexing pipeline.
 - For Nextcloud Files, the `fulltextsearch_files` app typically handles text extraction for common file types.
 
 ### No Wildcard or Regex Filters

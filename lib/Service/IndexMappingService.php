@@ -289,13 +289,20 @@ class IndexMappingService {
 	 * Extract plain text from a PDF binary using pdftotext (poppler-utils).
 	 */
 	private function extractTextFromPdf(string $pdfBinary): string {
+		if (!function_exists('exec')) {
+			return '';
+		}
+
 		$tmpFile = tempnam(sys_get_temp_dir(), 'fts_pdf_');
 		if ($tmpFile === false) {
 			return '';
 		}
 
 		try {
-			file_put_contents($tmpFile, $pdfBinary);
+			if (file_put_contents($tmpFile, $pdfBinary) === false) {
+				return '';
+			}
+
 			$output = [];
 			$exitCode = 0;
 			exec('pdftotext ' . escapeshellarg($tmpFile) . ' -', $output, $exitCode);

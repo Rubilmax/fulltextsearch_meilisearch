@@ -4,6 +4,12 @@
 -->
 # Changelog
 
+### 34.0.1
+
+- fix temporary Meilisearch communication failures during indexing with the fulltextsearch fork
+- require the rubilmax/fulltextsearch fork and align the Nextcloud minimum version
+- harden reset and optional PDF extraction behavior
+
 ### 34.0.0
 
 - compat nc34

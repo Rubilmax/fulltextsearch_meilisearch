@@ -78,7 +78,8 @@ class IndexService {
 	public function resetIndex(Client $client, string $providerId): void {
 		try {
 			$index = $client->index($this->indexMappingService->getIndexName());
-			$index->deleteDocuments(['filter' => "provider = '" . $this->escapeFilterValue($providerId) . "'"]);
+			$task = $index->deleteDocuments(['filter' => "provider = '" . $this->escapeFilterValue($providerId) . "'"]);
+			$this->waitForTaskCompletion($client, $task);
 		} catch (ApiException $e) {
 			$this->logger->error('reset index', ['exception' => $e]);
 		}
@@ -92,7 +93,8 @@ class IndexService {
 	 */
 	public function resetIndexAll(Client $client): void {
 		try {
-			$client->deleteIndex($this->indexMappingService->getIndexName());
+			$task = $client->deleteIndex($this->indexMappingService->getIndexName());
+			$this->waitForTaskCompletion($client, $task);
 		} catch (ApiException $e) {
 			$this->logger->warning($e->getMessage(), ['exception' => $e]);
 		}
