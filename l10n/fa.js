@@ -1,15 +1,17 @@
 OC.L10N.register(
-    "fulltextsearch_elasticsearch",
+    "fulltextsearch_meilisearch",
     {
-    "Full text search - Elasticsearch Platform" : "جستجوی متن کامل - پلتفرم Elasticsearch",
-    "Index using ElasticSearch" : "نمایه‌سازی با ElasticSearch",
-    "Extension to the _Full text search_ app to communicate with ElasticSearch." : "افزونه‌ای برای برنامه _جستجوی متن کامل_ جهت ارتباط با ElasticSearch",
-    "Elastic Search" : "Elastic Search",
-    "Address of the Servlet" : "آدرس Servlet",
-    "Include your credential in case authentication is required." : "در صورت نیاز به احراز هویت، اطلاعات کاربری خود را وارد کنید",
-    "Index" : "نمایه",
-    "Name of your index." : "نام نمایه شما",
-    "[Advanced] Analyzer tokenizer" : "[پیشرفته] تحلیل‌گر tokenizer",
-    "Some language might need a specific tokenizer." : "برخی زبان‌ها ممکن است به tokenizer خاصی نیاز داشته باشند"
+    "Full text search - Meilisearch Platform": "جستجوی متن کامل - پلتفرم Meilisearch",
+    "Index using Meilisearch": "نمایه‌سازی با Meilisearch",
+    "Extension to the _Full text search_ app to communicate with Meilisearch.": "افزونه‌ای برای برنامه _جستجوی متن کامل_ جهت ارتباط با Meilisearch",
+    "Meilisearch": "Meilisearch",
+    "Index": "نمایه",
+    "Name of your index.": "نام نمایه شما",
+    "Address of the Meilisearch server": "نشانی سرور Meilisearch",
+    "API Key": "کلید API",
+    "API key for authentication with Meilisearch.": "کلید API برای احراز هویت با Meilisearch.",
+    "Unknown Meilisearch setting": "تنظیم ناشناختهٔ Meilisearch",
+    "Invalid Meilisearch setting": "تنظیم نامعتبر Meilisearch"
 },
-"nplurals=2; plural=(n > 1);");
+    "nplurals=2; plural=(n > 1);"
+);

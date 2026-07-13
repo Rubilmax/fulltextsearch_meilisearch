@@ -1,13 +1,14 @@
 { "translations": {
-    "Full text search - Elasticsearch Platform" : "Ricerca del testo integrale - Piattaforma ElasticSearch",
-    "Index using ElasticSearch" : "Indicizza utilizzando ElasticSearch",
-    "Extension to the _Full text search_ app to communicate with ElasticSearch." : "Estensione dell'applicazione di ricerca del testo integrale per comunicare con ElasticSearch.",
-    "Elastic Search" : "Elastic Search",
-    "Address of the Servlet" : "Indirizzo del servlet",
-    "Include your credential in case authentication is required." : "Includi le tue credenziali in caso sia richiesta l'autenticazione.",
-    "Index" : "Indice",
-    "Name of your index." : "Nome del tuo indice.",
-    "[Advanced] Analyzer tokenizer" : "[Avanzato] Generatore di token dell'analizzatore",
-    "Some language might need a specific tokenizer." : "Alcune lingue potrebbero aver bisogno di un generatore di token specifico."
+    "Full text search - Meilisearch Platform": "Ricerca del testo integrale - Piattaforma Meilisearch",
+    "Index using Meilisearch": "Indicizza utilizzando Meilisearch",
+    "Extension to the _Full text search_ app to communicate with Meilisearch.": "Estensione dell'applicazione di ricerca del testo integrale per comunicare con Meilisearch.",
+    "Meilisearch": "Meilisearch",
+    "Index": "Indice",
+    "Name of your index.": "Nome del tuo indice.",
+    "Address of the Meilisearch server": "Indirizzo del server Meilisearch",
+    "API Key": "Chiave API",
+    "API key for authentication with Meilisearch.": "Chiave API per l’autenticazione con Meilisearch.",
+    "Unknown Meilisearch setting": "Impostazione Meilisearch sconosciuta",
+    "Invalid Meilisearch setting": "Impostazione Meilisearch non valida"
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

@@ -1,14 +1,17 @@
 OC.L10N.register(
-    "fulltextsearch_elasticsearch",
+    "fulltextsearch_meilisearch",
     {
-    "Full text search - Elasticsearch Platform" : "البحث النصي الكامل - منصة Elasticsearch",
-    "Index using ElasticSearch" : "فهرسة بواسطة ElasticSearch",
-    "Extension to the _Full text search_ app to communicate with ElasticSearch." : "تمديد للتطبيق Full text search للتواصل مع منصة البحث ElasticSearch.",
-    "Elastic Search" : "Elastic Search",
-    "Address of the Servlet" : "عنوان الـ Servlet",
-    "Include your credential in case authentication is required." : "قم بتضمين حيثيات دخولك في حالة طلب المصادقة.",
-    "Index" : "فهرس",
-    "Name of your index." : "اسم فهرسكم.",
-    "[Advanced] Analyzer tokenizer" : "المُحلّل للكلمات [Advanced] Analyzer tokenizer"
+    "Full text search - Meilisearch Platform": "البحث النصي الكامل - منصة Meilisearch",
+    "Index using Meilisearch": "فهرسة بواسطة Meilisearch",
+    "Extension to the _Full text search_ app to communicate with Meilisearch.": "تمديد للتطبيق Full text search للتواصل مع منصة البحث Meilisearch.",
+    "Meilisearch": "Meilisearch",
+    "Index": "فهرس",
+    "Name of your index.": "اسم فهرسكم.",
+    "Address of the Meilisearch server": "عنوان خادم Meilisearch",
+    "API Key": "مفتاح API",
+    "API key for authentication with Meilisearch.": "مفتاح API للمصادقة مع Meilisearch.",
+    "Unknown Meilisearch setting": "إعداد Meilisearch غير معروف",
+    "Invalid Meilisearch setting": "إعداد Meilisearch غير صالح"
 },
-"nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;");
+    "nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;"
+);

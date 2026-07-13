@@ -1,15 +1,17 @@
 OC.L10N.register(
-    "fulltextsearch_elasticsearch",
+    "fulltextsearch_meilisearch",
     {
-    "Full text search - Elasticsearch Platform" : "全文検索 - Elasticsearch Platform",
-    "Index using ElasticSearch" : "ElasticSearchを使用したインデックス",
-    "Extension to the _Full text search_ app to communicate with ElasticSearch." : "ElasticSearchと通信するための_フルテキスト検索_アプリへの拡張。",
-    "Elastic Search" : "Elastic Search",
-    "Address of the Servlet" : "サーブレットのアドレス",
-    "Include your credential in case authentication is required." : "認証が必要な場合は、資格情報を含めてください。",
-    "Index" : "インデックス",
-    "Name of your index." : "インデックスの名前。",
-    "[Advanced] Analyzer tokenizer" : "[Advanced] アナライザ トークナイザ",
-    "Some language might need a specific tokenizer." : "一部の言語には特定のトークナイザーが必要になる場合があります。"
+    "Full text search - Meilisearch Platform": "全文検索 - Meilisearch Platform",
+    "Index using Meilisearch": "Meilisearchを使用したインデックス",
+    "Extension to the _Full text search_ app to communicate with Meilisearch.": "Meilisearchと通信するための_フルテキスト検索_アプリへの拡張。",
+    "Meilisearch": "Meilisearch",
+    "Index": "インデックス",
+    "Name of your index.": "インデックスの名前。",
+    "Address of the Meilisearch server": "Meilisearchサーバーのアドレス",
+    "API Key": "APIキー",
+    "API key for authentication with Meilisearch.": "Meilisearchでの認証用APIキー。",
+    "Unknown Meilisearch setting": "不明なMeilisearch設定",
+    "Invalid Meilisearch setting": "無効なMeilisearch設定"
 },
-"nplurals=1; plural=0;");
+    "nplurals=1; plural=0;"
+);

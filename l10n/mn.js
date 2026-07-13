@@ -1,15 +1,17 @@
 OC.L10N.register(
-    "fulltextsearch_elasticsearch",
+    "fulltextsearch_meilisearch",
     {
-    "Full text search - Elasticsearch Platform" : "Бүрэн текст хайлт - Эластикхайлт Платформ",
-    "Index using ElasticSearch" : "ЭластикХайлт ашиглан индексжүүлэх",
-    "Extension to the _Full text search_ app to communicate with ElasticSearch." : "ЭластикХайлт -тай харилцах _Full text search_ аппын нэмэлт өргөтгөл.",
-    "Elastic Search" : "Эластик хайлт",
-    "Address of the Servlet" : "Servlet -н хаяг",
-    "Include your credential in case authentication is required." : "Баталгаажуулалт шаардлагатай тохиолдолд мэдээллээ оруулна уу.",
-    "Index" : "Индекс",
-    "Name of your index." : "Таны индексийн нэр",
-    "[Advanced] Analyzer tokenizer" : "[Мэргэжлийн] Анализаторын токенжуулагч",
-    "Some language might need a specific tokenizer." : "Зарим хэл нь тусгай токенизатор шаардаж болно."
+    "Full text search - Meilisearch Platform": "Бүрэн текст хайлт - Meilisearch платформ",
+    "Index using Meilisearch": "Meilisearch ашиглан индексжүүлэх",
+    "Extension to the _Full text search_ app to communicate with Meilisearch.": "Meilisearch-тэй харилцах _Full text search_ аппын нэмэлт өргөтгөл.",
+    "Meilisearch": "Meilisearch",
+    "Index": "Индекс",
+    "Name of your index.": "Таны индексийн нэр",
+    "Address of the Meilisearch server": "Meilisearch серверийн хаяг",
+    "API Key": "API түлхүүр",
+    "API key for authentication with Meilisearch.": "Meilisearch-д нэвтрэх API түлхүүр.",
+    "Unknown Meilisearch setting": "Тодорхойгүй Meilisearch тохиргоо",
+    "Invalid Meilisearch setting": "Буруу Meilisearch тохиргоо"
 },
-"nplurals=2; plural=(n != 1);");
+    "nplurals=2; plural=(n != 1);"
+);

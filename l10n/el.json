@@ -1,12 +1,14 @@
 { "translations": {
-    "Full text search - Elasticsearch Platform" : "Πλήρης αναζήτηση κειμένου - Πλατφόρμα Elasticsearch",
-    "Index using ElasticSearch" : "Ευρετηριοποίηση με τη χρήση Elasticsearch",
-    "Extension to the _Full text search_ app to communicate with ElasticSearch." : "Επέκταση της εφαρμογής _Full text search_ για επικοινωνία με ElasticSearch.",
-    "Elastic Search" : "Elastic Search",
-    "Address of the Servlet" : "Διεύθυνση του Servlet",
-    "Include your credential in case authentication is required." : "Συμπεριλάβετε τα διαπιστευτήριά σας σε περίπτωση που απαιτείται πιστοποίηση.",
-    "Index" : "Ευρετήριο",
-    "Name of your index." : "Όνομα του ευρετηρίου σας.",
-    "[Advanced] Analyzer tokenizer" : "[Advanced]  Αναλυτής Λεξικής ανάλυσης"
+    "Full text search - Meilisearch Platform": "Πλήρης αναζήτηση κειμένου - Πλατφόρμα Meilisearch",
+    "Index using Meilisearch": "Ευρετηριοποίηση με τη χρήση Meilisearch",
+    "Extension to the _Full text search_ app to communicate with Meilisearch.": "Επέκταση της εφαρμογής _Full text search_ για επικοινωνία με Meilisearch.",
+    "Meilisearch": "Meilisearch",
+    "Index": "Ευρετήριο",
+    "Name of your index.": "Όνομα του ευρετηρίου σας.",
+    "Address of the Meilisearch server": "Διεύθυνση του διακομιστή Meilisearch",
+    "API Key": "Κλειδί API",
+    "API key for authentication with Meilisearch.": "Κλειδί API για έλεγχο ταυτότητας με το Meilisearch.",
+    "Unknown Meilisearch setting": "Άγνωστη ρύθμιση Meilisearch",
+    "Invalid Meilisearch setting": "Μη έγκυρη ρύθμιση Meilisearch"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

@@ -1,14 +1,17 @@
 OC.L10N.register(
-    "fulltextsearch_elasticsearch",
+    "fulltextsearch_meilisearch",
     {
-    "Full text search - Elasticsearch Platform" : "Plenteksta serĉo — „Elasticsearch“",
-    "Index using ElasticSearch" : "Indeksi per „Elasticsearch“",
-    "Extension to the _Full text search_ app to communicate with ElasticSearch." : "Kromaĵo al la aplikaĵo _Plenteksta serĉo_ por uzi Elasticsearch-on.",
-    "Elastic Search" : "Elasticsearch",
-    "Address of the Servlet" : "Adreso de la servleto",
-    "Include your credential in case authentication is required." : "Enmeti viajn akreditilojn, okaze se oni bezonas aŭtentigon.",
-    "Index" : "Indekso",
-    "Name of your index." : "Nomo de via indekso.",
-    "[Advanced] Analyzer tokenizer" : "[Altnivela] Vorta disigilo kaj analizilo"
+    "Full text search - Meilisearch Platform": "Plenteksta serĉo — „Meilisearch“",
+    "Index using Meilisearch": "Indeksi per „Meilisearch“",
+    "Extension to the _Full text search_ app to communicate with Meilisearch.": "Kromaĵo al la aplikaĵo _Plenteksta serĉo_ por uzi Meilisearch-on.",
+    "Meilisearch": "Meilisearch",
+    "Index": "Indekso",
+    "Name of your index.": "Nomo de via indekso.",
+    "Address of the Meilisearch server": "Adreso de la Meilisearch-servilo",
+    "API Key": "API-ŝlosilo",
+    "API key for authentication with Meilisearch.": "API-ŝlosilo por aŭtentigo ĉe Meilisearch.",
+    "Unknown Meilisearch setting": "Nekonata agordo de Meilisearch",
+    "Invalid Meilisearch setting": "Nevalida agordo de Meilisearch"
 },
-"nplurals=2; plural=(n != 1);");
+    "nplurals=2; plural=(n != 1);"
+);

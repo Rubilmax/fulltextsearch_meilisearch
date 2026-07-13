@@ -1,15 +1,17 @@
 OC.L10N.register(
-    "fulltextsearch_elasticsearch",
+    "fulltextsearch_meilisearch",
     {
-    "Full text search - Elasticsearch Platform" : "Teljes szöveges keresés – Elasticsearch platform",
-    "Index using ElasticSearch" : "Indexelés Elasticsearch használatával",
-    "Extension to the _Full text search_ app to communicate with ElasticSearch." : "Kiegészítő a _Teljes szöveges keresés_ alkalmazáshoz, hogy kommunikálhasson az Elasticsearch-csel.",
-    "Elastic Search" : "Elasticsearch keresés",
-    "Address of the Servlet" : "A szervlet címe",
-    "Include your credential in case authentication is required." : "A bejelentkezési adatai használata, ha hitelesítés szükséges.",
-    "Index" : "Index",
-    "Name of your index." : "Az indexe neve.",
-    "[Advanced] Analyzer tokenizer" : "[Speciális] Lexikális szövegbontásos elemzés",
-    "Some language might need a specific tokenizer." : "Egyes nyelvekhez egy adott lexikális szövegbontásra lehet szükség."
+    "Full text search - Meilisearch Platform": "Teljes szöveges keresés – Meilisearch platform",
+    "Index using Meilisearch": "Indexelés Meilisearch használatával",
+    "Extension to the _Full text search_ app to communicate with Meilisearch.": "Kiegészítő a _Teljes szöveges keresés_ alkalmazáshoz, hogy kommunikálhasson az Meilisearch-csel.",
+    "Meilisearch": "Meilisearch",
+    "Index": "Index",
+    "Name of your index.": "Az indexe neve.",
+    "Address of the Meilisearch server": "A Meilisearch-kiszolgáló címe",
+    "API Key": "API-kulcs",
+    "API key for authentication with Meilisearch.": "API-kulcs a Meilisearch-hitelesítéshez.",
+    "Unknown Meilisearch setting": "Ismeretlen Meilisearch-beállítás",
+    "Invalid Meilisearch setting": "Érvénytelen Meilisearch-beállítás"
 },
-"nplurals=2; plural=(n != 1);");
+    "nplurals=2; plural=(n != 1);"
+);

@@ -1,12 +1,14 @@
 { "translations": {
-    "Full text search - Elasticsearch Platform" : "Elasticsearch Platform - платформа за търсене на пълен текст",
-    "Index using ElasticSearch" : "Индексиране с помощта на ElasticSearch",
-    "Extension to the _Full text search_ app to communicate with ElasticSearch." : "Разширение към приложението _Full text search_ за комуникация с ElasticSearch.",
-    "Elastic Search" : "Elastic Search /Еластично търсене/",
-    "Address of the Servlet" : "Адрес на сървлета",
-    "Include your credential in case authentication is required." : "Включете вашите идентификационни данни, в случай че е нужно удостоверяване.",
-    "Index" : "Индекс",
-    "Name of your index." : "Име на вашия индекс.",
-    "[Advanced] Analyzer tokenizer" : "[Разширен] Анализатор токенизатор"
+    "Full text search - Meilisearch Platform": "Meilisearch Platform - платформа за търсене на пълен текст",
+    "Index using Meilisearch": "Индексиране с помощта на Meilisearch",
+    "Extension to the _Full text search_ app to communicate with Meilisearch.": "Разширение към приложението _Full text search_ за комуникация с Meilisearch.",
+    "Meilisearch": "Meilisearch",
+    "Index": "Индекс",
+    "Name of your index.": "Име на вашия индекс.",
+    "Address of the Meilisearch server": "Адрес на сървъра Meilisearch",
+    "API Key": "API ключ",
+    "API key for authentication with Meilisearch.": "API ключ за удостоверяване с Meilisearch.",
+    "Unknown Meilisearch setting": "Неизвестна настройка на Meilisearch",
+    "Invalid Meilisearch setting": "Невалидна настройка на Meilisearch"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

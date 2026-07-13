@@ -1,13 +1,14 @@
 { "translations": {
-    "Full text search - Elasticsearch Platform" : "Full text search - Elasticsearch Platform",
-    "Index using ElasticSearch" : "Index using ElasticSearch",
-    "Extension to the _Full text search_ app to communicate with ElasticSearch." : "Extension to the _Full text search_ app to communicate with ElasticSearch.",
-    "Elastic Search" : "Elastic Search",
-    "Address of the Servlet" : "Address of the Servlet",
-    "Include your credential in case authentication is required." : "Include your credential in case authentication is required.",
-    "Index" : "Index",
-    "Name of your index." : "Name of your index.",
-    "[Advanced] Analyzer tokenizer" : "[Advanced] Analyzer tokenizer",
-    "Some language might need a specific tokenizer." : "Some languages might need a specific tokeniser."
+    "Full text search - Meilisearch Platform": "Full text search - Meilisearch Platform",
+    "Index using Meilisearch": "Index using Meilisearch",
+    "Extension to the _Full text search_ app to communicate with Meilisearch.": "Extension to the _Full text search_ app to communicate with Meilisearch.",
+    "Meilisearch": "Meilisearch",
+    "Index": "Index",
+    "Name of your index.": "Name of your index.",
+    "Address of the Meilisearch server": "Address of the Meilisearch server",
+    "API Key": "API key",
+    "API key for authentication with Meilisearch.": "API key for authentication with Meilisearch.",
+    "Unknown Meilisearch setting": "Unknown Meilisearch setting",
+    "Invalid Meilisearch setting": "Invalid Meilisearch setting"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

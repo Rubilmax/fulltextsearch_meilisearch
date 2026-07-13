@@ -1,15 +1,17 @@
 OC.L10N.register(
-    "fulltextsearch_elasticsearch",
+    "fulltextsearch_meilisearch",
     {
-    "Full text search - Elasticsearch Platform" : "Utafutaji wa maandishi kamili - jukwaa la Elasticsearch ",
-    "Index using ElasticSearch" : "Fahirisi kwa kutumia ElasticSearch",
-    "Extension to the _Full text search_ app to communicate with ElasticSearch." : "Kiendelezi cha programu ya _Full text search_ ili kuwasiliana na ElasticSearch.",
-    "Elastic Search" : " Utafutaji wa Elastic",
-    "Address of the Servlet" : "Anwani ya Servlet",
-    "Include your credential in case authentication is required." : "Jumuisha kitambulisho chako ikiwa uthibitishaji utahitajika.",
-    "Index" : "Faharasa",
-    "Name of your index." : "Jina la faharasa yako",
-    "[Advanced] Analyzer tokenizer" : " [Ya juu] Kichanganuzi tokenizer",
-    "Some language might need a specific tokenizer." : "Lugha fulani inaweza kuhitaji kiashiria maalum."
+    "Full text search - Meilisearch Platform": "Utafutaji wa maandishi kamili - jukwaa la Meilisearch ",
+    "Index using Meilisearch": "Fahirisi kwa kutumia Meilisearch",
+    "Extension to the _Full text search_ app to communicate with Meilisearch.": "Kiendelezi cha programu ya _Full text search_ ili kuwasiliana na Meilisearch.",
+    "Meilisearch": "Meilisearch",
+    "Index": "Faharasa",
+    "Name of your index.": "Jina la faharasa yako",
+    "Address of the Meilisearch server": "Anwani ya seva ya Meilisearch",
+    "API Key": "Ufunguo wa API",
+    "API key for authentication with Meilisearch.": "Ufunguo wa API wa uthibitishaji na Meilisearch.",
+    "Unknown Meilisearch setting": "Mpangilio wa Meilisearch usiojulikana",
+    "Invalid Meilisearch setting": "Mpangilio batili wa Meilisearch"
 },
-"nplurals=2; plural=(n != 1);");
+    "nplurals=2; plural=(n != 1);"
+);

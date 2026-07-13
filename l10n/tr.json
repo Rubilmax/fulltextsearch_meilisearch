@@ -1,13 +1,14 @@
 { "translations": {
-    "Full text search - Elasticsearch Platform" : "Tam yazı arama - ElasticSearch platformu",
-    "Index using ElasticSearch" : "ElasticSearch ile dizin oluşturulsun",
-    "Extension to the _Full text search_ app to communicate with ElasticSearch." : "ElasticSearch ile iletişim kuracak _Full text search_ uygulama eklentisi.",
-    "Elastic Search" : "Elastic search",
-    "Address of the Servlet" : "Sunucu kodunun adresi",
-    "Include your credential in case authentication is required." : "Kimlik doğrulaması gerekiyorsa kimlik bilgilerinizi katın.",
-    "Index" : "Dizin",
-    "Name of your index." : "Dizin adı.",
-    "[Advanced] Analyzer tokenizer" : "[Gelişmiş] inceleyici kodlayıcı",
-    "Some language might need a specific tokenizer." : "Bazı diller için özel bir kodlayıcı gerekebilir."
+    "Full text search - Meilisearch Platform": "Tam yazı arama - Meilisearch platformu",
+    "Index using Meilisearch": "Meilisearch ile dizin oluşturulsun",
+    "Extension to the _Full text search_ app to communicate with Meilisearch.": "Meilisearch ile iletişim kuracak _Full text search_ uygulama eklentisi.",
+    "Meilisearch": "Meilisearch",
+    "Index": "Dizin",
+    "Name of your index.": "Dizin adı.",
+    "Address of the Meilisearch server": "Meilisearch sunucusunun adresi",
+    "API Key": "API anahtarı",
+    "API key for authentication with Meilisearch.": "Meilisearch kimlik doğrulaması için API anahtarı.",
+    "Unknown Meilisearch setting": "Bilinmeyen Meilisearch ayarı",
+    "Invalid Meilisearch setting": "Geçersiz Meilisearch ayarı"
 },"pluralForm" :"nplurals=2; plural=(n > 1);"
 }

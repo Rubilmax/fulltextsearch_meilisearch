@@ -66,7 +66,7 @@ class Admin implements IDeclarativeSettingsFormWithHandlers {
 	public function getValue(string $fieldId, IUser $user): mixed {
 		$config = $this->configService->getConfig();
 		if (!array_key_exists($fieldId, $config)) {
-			throw new InvalidArgumentException('Unknown Meilisearch setting');
+			throw new InvalidArgumentException($this->l->t('Unknown Meilisearch setting'));
 		}
 
 		return $config[$fieldId];
@@ -80,7 +80,7 @@ class Admin implements IDeclarativeSettingsFormWithHandlers {
 
 		$data = [$fieldId => $value];
 		if (!$this->configService->checkConfig($data)) {
-			throw new InvalidArgumentException('Invalid Meilisearch setting');
+			throw new InvalidArgumentException($this->l->t('Invalid Meilisearch setting'));
 		}
 
 		$this->configService->setConfig($data);

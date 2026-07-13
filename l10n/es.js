@@ -1,15 +1,17 @@
 OC.L10N.register(
-    "fulltextsearch_elasticsearch",
+    "fulltextsearch_meilisearch",
     {
-    "Full text search - Elasticsearch Platform" : "Búsqueda de texto completo - Plataforma Elasticsearch",
-    "Index using ElasticSearch" : "Indexación usando ElasticSearch",
-    "Extension to the _Full text search_ app to communicate with ElasticSearch." : "Extensión de la app _Búsqueda de text completo_ para que se comunique con ElasticSearch.",
-    "Elastic Search" : "Elastic Search",
-    "Address of the Servlet" : "Dirección del Servlet",
-    "Include your credential in case authentication is required." : "Incluye tu credencial por si se requiere autenticación.",
-    "Index" : "Índice",
-    "Name of your index." : "Nombre de tu índice",
-    "[Advanced] Analyzer tokenizer" : "[Avanzado] Tokenizador del analizador",
-    "Some language might need a specific tokenizer." : "Algunos idiomas podrían necesitar un token específico."
+    "Full text search - Meilisearch Platform": "Búsqueda de texto completo - Plataforma Meilisearch",
+    "Index using Meilisearch": "Indexación usando Meilisearch",
+    "Extension to the _Full text search_ app to communicate with Meilisearch.": "Extensión de la app _Búsqueda de text completo_ para que se comunique con Meilisearch.",
+    "Meilisearch": "Meilisearch",
+    "Index": "Índice",
+    "Name of your index.": "Nombre de tu índice",
+    "Address of the Meilisearch server": "Dirección del servidor Meilisearch",
+    "API Key": "Clave de API",
+    "API key for authentication with Meilisearch.": "Clave de API para autenticarse con Meilisearch.",
+    "Unknown Meilisearch setting": "Ajuste de Meilisearch desconocido",
+    "Invalid Meilisearch setting": "Ajuste de Meilisearch no válido"
 },
-"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");
+    "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
+);

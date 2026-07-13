@@ -1,13 +1,14 @@
 { "translations": {
-    "Full text search - Elasticsearch Platform" : "Fulltextsökning - ElasticSearch Platform",
-    "Index using ElasticSearch" : "Indexera med ElasticSearch",
-    "Extension to the _Full text search_ app to communicate with ElasticSearch." : "Tillägg till appen _Full text search_ för att kommunicera med ElasticSearch.",
-    "Elastic Search" : "Elastic Search",
-    "Address of the Servlet" : "Adress till Servlet",
-    "Include your credential in case authentication is required." : "Inkludera dina inloggningsuppgifter ifall autentisering krävs.",
-    "Index" : "Index",
-    "Name of your index." : "Namn på ditt index",
-    "[Advanced] Analyzer tokenizer" : "[Advanced] Analysator tokenizer",
-    "Some language might need a specific tokenizer." : "Vissa språk kan kräva en specifik tokeniserare."
+    "Full text search - Meilisearch Platform": "Fulltextsökning - Meilisearch Platform",
+    "Index using Meilisearch": "Indexera med Meilisearch",
+    "Extension to the _Full text search_ app to communicate with Meilisearch.": "Tillägg till appen _Full text search_ för att kommunicera med Meilisearch.",
+    "Meilisearch": "Meilisearch",
+    "Index": "Index",
+    "Name of your index.": "Namn på ditt index",
+    "Address of the Meilisearch server": "Adress till Meilisearch-servern",
+    "API Key": "API-nyckel",
+    "API key for authentication with Meilisearch.": "API-nyckel för autentisering med Meilisearch.",
+    "Unknown Meilisearch setting": "Okänd Meilisearch-inställning",
+    "Invalid Meilisearch setting": "Ogiltig Meilisearch-inställning"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

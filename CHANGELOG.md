@@ -4,6 +4,11 @@
 -->
 # Changelog
 
+### 34.0.3
+
+- update every bundled translation for Meilisearch and cover all displayed settings strings
+- localize invalid and unknown setting errors
+
 ### 34.0.2
 
 - use Nextcloud 34 declarative settings with native autosave behavior

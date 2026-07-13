@@ -1,10 +1,14 @@
 { "translations": {
-    "Full text search - Elasticsearch Platform" : "Koko tekstin haku - Elasticsearch-alusta",
-    "Index using ElasticSearch" : "Indeksi ElasticSearchia käyttäen",
-    "Elastic Search" : "Elastic Search",
-    "Address of the Servlet" : "Servletin osoite",
-    "Include your credential in case authentication is required." : "Sisällytä tunnistustiedot, jos tunnistautuminen vaaditaan.",
-    "Index" : "Indeksi",
-    "Name of your index." : "Indeksin nimi."
+    "Full text search - Meilisearch Platform": "Koko tekstin haku - Meilisearch-alusta",
+    "Index using Meilisearch": "Indeksi Meilisearchia käyttäen",
+    "Extension to the _Full text search_ app to communicate with Meilisearch.": "Laajennus _Koko tekstin haku_ -sovellukseen Meilisearch-yhteyttä varten.",
+    "Meilisearch": "Meilisearch",
+    "Index": "Indeksi",
+    "Name of your index.": "Indeksin nimi.",
+    "Address of the Meilisearch server": "Meilisearch-palvelimen osoite",
+    "API Key": "API-avain",
+    "API key for authentication with Meilisearch.": "API-avain Meilisearch-tunnistautumiseen.",
+    "Unknown Meilisearch setting": "Tuntematon Meilisearch-asetus",
+    "Invalid Meilisearch setting": "Virheellinen Meilisearch-asetus"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

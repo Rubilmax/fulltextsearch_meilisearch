@@ -1,15 +1,17 @@
 OC.L10N.register(
-    "fulltextsearch_elasticsearch",
+    "fulltextsearch_meilisearch",
     {
-    "Full text search - Elasticsearch Platform" : "To'liq matnli qidiruv - Kengaytirilgan izlash platformasi",
-    "Index using ElasticSearch" : "Kengaytirilgan qidiruv yordamida indeks",
-    "Extension to the _Full text search_ app to communicate with ElasticSearch." : "Kengaytirilgan qidiruv bilan bogʻlanish uchun _Toʻliq matnli qidiruv_ ilovasiga kengaytma.",
-    "Elastic Search" : "Kengaytirilgan qidiruv",
-    "Address of the Servlet" : "Servlet manzili",
-    "Include your credential in case authentication is required." : "Agar autentifikatsiya zarur bo'lsa, hisob ma'lumotlaringizni kiriting.",
-    "Index" : "indeks",
-    "Name of your index." : "Indeksingiz nomi.",
-    "[Advanced] Analyzer tokenizer" : "[Kengaytirilgan] Analizator tokeni",
-    "Some language might need a specific tokenizer." : "Ba'zi tillar uchun maxsus tokenizator kerak bo'lishi mumkin."
+    "Full text search - Meilisearch Platform": "To‘liq matnli qidiruv - Meilisearch platformasi",
+    "Index using Meilisearch": "Meilisearch yordamida indekslash",
+    "Extension to the _Full text search_ app to communicate with Meilisearch.": "Meilisearch bilan bog‘lanish uchun _To‘liq matnli qidiruv_ ilovasi kengaytmasi.",
+    "Meilisearch": "Meilisearch",
+    "Index": "indeks",
+    "Name of your index.": "Indeksingiz nomi.",
+    "Address of the Meilisearch server": "Meilisearch serverining manzili",
+    "API Key": "API kaliti",
+    "API key for authentication with Meilisearch.": "Meilisearch bilan autentifikatsiya qilish uchun API kaliti.",
+    "Unknown Meilisearch setting": "Noma’lum Meilisearch sozlamasi",
+    "Invalid Meilisearch setting": "Meilisearch sozlamasi noto‘g‘ri"
 },
-"nplurals=1; plural=0;");
+    "nplurals=1; plural=0;"
+);
