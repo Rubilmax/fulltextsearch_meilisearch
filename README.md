@@ -78,7 +78,7 @@ occ app:enable fulltextsearch_meilisearch
 Go to **Settings > Administration > Full text search** and fill in:
 
 - **Meilisearch Host**: The URL of your Meilisearch instance (e.g., `http://localhost:7700`)
-- **Meilisearch Index**: The name of the index to use (e.g., `nextcloud`)
+- **Meilisearch Index**: The name of the index to use (defaults to `nextcloud`)
 - **API Key**: Your Meilisearch API key (the master key or a key with appropriate permissions)
 
 #### Via the Command Line

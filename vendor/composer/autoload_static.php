@@ -296,7 +296,6 @@ class ComposerStaticInitFullTextSearch_Meilisearch
         'OCA\\FullTextSearch_Meilisearch\\AppInfo\\Application' => __DIR__ . '/../..' . '/lib/AppInfo/Application.php',
         'OCA\\FullTextSearch_Meilisearch\\Command\\Configure' => __DIR__ . '/../..' . '/lib/Command/Configure.php',
         'OCA\\FullTextSearch_Meilisearch\\ConfigLexicon' => __DIR__ . '/../..' . '/lib/ConfigLexicon.php',
-        'OCA\\FullTextSearch_Meilisearch\\Controller\\SettingsController' => __DIR__ . '/../..' . '/lib/Controller/SettingsController.php',
         'OCA\\FullTextSearch_Meilisearch\\Exceptions\\AccessIsEmptyException' => __DIR__ . '/../..' . '/lib/Exceptions/AccessIsEmptyException.php',
         'OCA\\FullTextSearch_Meilisearch\\Exceptions\\ClientException' => __DIR__ . '/../..' . '/lib/Exceptions/ClientException.php',
         'OCA\\FullTextSearch_Meilisearch\\Exceptions\\ConfigurationException' => __DIR__ . '/../..' . '/lib/Exceptions/ConfigurationException.php',

@@ -3,7 +3,7 @@
         'name' => 'nextcloud/fulltextsearch_meilisearch',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => 'ebc3dd7e8b25c8939d5cfb7e18bd3512b2eb599a',
+        'reference' => '3162cd420dda8470af7ea8e1f317f765d59e35b9',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -58,7 +58,7 @@
         'nextcloud/fulltextsearch_meilisearch' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'ebc3dd7e8b25c8939d5cfb7e18bd3512b2eb599a',
+            'reference' => '3162cd420dda8470af7ea8e1f317f765d59e35b9',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

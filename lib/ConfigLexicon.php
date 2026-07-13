@@ -15,6 +15,7 @@ use OCP\Config\ValueType;
 use OCP\IAppConfig;
 
 class ConfigLexicon implements ILexicon {
+	public const DEFAULT_MEILISEARCH_INDEX = 'nextcloud';
 	public const MEILISEARCH_HOST = 'meilisearch_host';
 	public const MEILISEARCH_INDEX = 'meilisearch_index';
 	public const MEILISEARCH_API_KEY = 'meilisearch_api_key';
@@ -26,7 +27,7 @@ class ConfigLexicon implements ILexicon {
 	public function getAppConfigs(): array {
 		return [
 			new Entry(key: self::MEILISEARCH_HOST, type: ValueType::STRING, defaultRaw: '', definition: 'Address of the Meilisearch server', lazy: true),
-			new Entry(key: self::MEILISEARCH_INDEX, type: ValueType::STRING, defaultRaw: '', definition: 'Name of the index on Meilisearch', lazy: true),
+			new Entry(key: self::MEILISEARCH_INDEX, type: ValueType::STRING, defaultRaw: self::DEFAULT_MEILISEARCH_INDEX, definition: 'Name of the index on Meilisearch', lazy: true),
 			new Entry(key: self::MEILISEARCH_API_KEY, type: ValueType::STRING, defaultRaw: '', definition: 'API key for Meilisearch authentication', lazy: true, flags: IAppConfig::FLAG_SENSITIVE),
 		];
 	}

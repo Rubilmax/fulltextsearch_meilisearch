@@ -205,7 +205,6 @@ return array(
     'OCA\\FullTextSearch_Meilisearch\\AppInfo\\Application' => $baseDir . '/lib/AppInfo/Application.php',
     'OCA\\FullTextSearch_Meilisearch\\Command\\Configure' => $baseDir . '/lib/Command/Configure.php',
     'OCA\\FullTextSearch_Meilisearch\\ConfigLexicon' => $baseDir . '/lib/ConfigLexicon.php',
-    'OCA\\FullTextSearch_Meilisearch\\Controller\\SettingsController' => $baseDir . '/lib/Controller/SettingsController.php',
     'OCA\\FullTextSearch_Meilisearch\\Exceptions\\AccessIsEmptyException' => $baseDir . '/lib/Exceptions/AccessIsEmptyException.php',
     'OCA\\FullTextSearch_Meilisearch\\Exceptions\\ClientException' => $baseDir . '/lib/Exceptions/ClientException.php',
     'OCA\\FullTextSearch_Meilisearch\\Exceptions\\ConfigurationException' => $baseDir . '/lib/Exceptions/ConfigurationException.php',

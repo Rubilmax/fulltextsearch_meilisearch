@@ -52,7 +52,7 @@ class ConfigService {
 	public function getMeilisearchIndex(): string {
 		$index = trim($this->appConfig->getAppValueString(ConfigLexicon::MEILISEARCH_INDEX));
 		if ($index === '') {
-			throw new ConfigurationException('Your MeilisearchPlatform is not configured properly');
+			return ConfigLexicon::DEFAULT_MEILISEARCH_INDEX;
 		}
 
 		return $index;

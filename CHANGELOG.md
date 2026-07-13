@@ -4,6 +4,12 @@
 -->
 # Changelog
 
+### 34.0.2
+
+- use Nextcloud 34 declarative settings with native autosave behavior
+- default the runtime Meilisearch index to `nextcloud` while preserving explicitly saved empty values
+- preserve and mask existing API keys when editing other settings
+
 ### 34.0.1
 
 - fix temporary Meilisearch communication failures during indexing with the fulltextsearch fork

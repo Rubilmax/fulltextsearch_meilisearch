@@ -9,39 +9,80 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch_Meilisearch\Settings;
 
-use Exception;
-use OCA\FullTextSearch_Meilisearch\AppInfo\Application;
-use OCP\AppFramework\Http\TemplateResponse;
-use OCP\Settings\ISettings;
+use InvalidArgumentException;
+use OCA\FullTextSearch_Meilisearch\ConfigLexicon;
+use OCA\FullTextSearch_Meilisearch\Service\ConfigService;
+use OCP\IL10N;
+use OCP\IUser;
+use OCP\Settings\DeclarativeSettingsTypes;
+use OCP\Settings\IDeclarativeSettingsFormWithHandlers;
 
-class Admin implements ISettings {
+class Admin implements IDeclarativeSettingsFormWithHandlers {
 
-	public function __construct() {
+	public function __construct(
+		private readonly ConfigService $configService,
+		private readonly IL10N $l,
+	) {
 	}
 
-	/**
-	 * @return TemplateResponse
-	 * @throws Exception
-	 */
-	public function getForm(): TemplateResponse {
-		return new TemplateResponse(Application::APP_NAME, 'settings.admin', []);
+	#[\Override]
+	public function getSchema(): array {
+		return [
+			'id' => 'meilisearch',
+			'priority' => 31,
+			'section_type' => DeclarativeSettingsTypes::SECTION_TYPE_ADMIN,
+			'section_id' => 'fulltextsearch',
+			'storage_type' => DeclarativeSettingsTypes::STORAGE_TYPE_EXTERNAL,
+			'title' => $this->l->t('Meilisearch'),
+			'fields' => [
+				[
+					'id' => ConfigLexicon::MEILISEARCH_HOST,
+					'title' => $this->l->t('Address of the Meilisearch server'),
+					'type' => DeclarativeSettingsTypes::URL,
+					'placeholder' => 'http://localhost:7700',
+					'default' => '',
+				],
+				[
+					'id' => ConfigLexicon::MEILISEARCH_INDEX,
+					'title' => $this->l->t('Index'),
+					'description' => $this->l->t('Name of your index.'),
+					'type' => DeclarativeSettingsTypes::TEXT,
+					'placeholder' => ConfigLexicon::DEFAULT_MEILISEARCH_INDEX,
+					'default' => ConfigLexicon::DEFAULT_MEILISEARCH_INDEX,
+				],
+				[
+					'id' => ConfigLexicon::MEILISEARCH_API_KEY,
+					'title' => $this->l->t('API Key'),
+					'description' => $this->l->t('API key for authentication with Meilisearch.'),
+					'type' => DeclarativeSettingsTypes::PASSWORD,
+					'default' => '',
+					'sensitive' => true,
+				],
+			],
+		];
 	}
 
-	/**
-	 * @return string the section ID, e.g. 'sharing'
-	 */
-	public function getSection(): string {
-		return 'fulltextsearch';
+	#[\Override]
+	public function getValue(string $fieldId, IUser $user): mixed {
+		$config = $this->configService->getConfig();
+		if (!array_key_exists($fieldId, $config)) {
+			throw new InvalidArgumentException('Unknown Meilisearch setting');
+		}
+
+		return $config[$fieldId];
 	}
 
-	/**
-	 * @return int whether the form should be rather on the top or bottom of
-	 * the admin section. The forms are arranged in ascending order of the
-	 * priority values. It is required to return a value between 0 and 100.
-	 *
-	 * keep the server setting at the top, right after "server settings"
-	 */
-	public function getPriority(): int {
-		return 31;
+	#[\Override]
+	public function setValue(string $fieldId, mixed $value, IUser $user): void {
+		if ($fieldId === ConfigLexicon::MEILISEARCH_API_KEY && $value === 'dummySecret') {
+			return;
+		}
+
+		$data = [$fieldId => $value];
+		if (!$this->configService->checkConfig($data)) {
+			throw new InvalidArgumentException('Invalid Meilisearch setting');
+		}
+
+		$this->configService->setConfig($data);
 	}
 }

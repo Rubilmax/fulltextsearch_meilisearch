@@ -14,7 +14,7 @@ Extension to the _Full text search_ app to communicate with Meilisearch.
 
 ]]>
 	</description>
-	<version>34.0.1</version>
+	<version>34.0.2</version>
 	<licence>agpl</licence>
 	<author>Maxence Lange</author>
 	<namespace>FullTextSearch_Meilisearch</namespace>
@@ -33,10 +33,6 @@ Extension to the _Full text search_ app to communicate with Meilisearch.
 	<commands>
 		<command>OCA\FullTextSearch_Meilisearch\Command\Configure</command>
 	</commands>
-
-	<settings>
-		<admin>OCA\FullTextSearch_Meilisearch\Settings\Admin</admin>
-	</settings>
 
 	<fulltextsearch>
 		<platform>OCA\FullTextSearch_Meilisearch\Platform\MeilisearchPlatform</platform>

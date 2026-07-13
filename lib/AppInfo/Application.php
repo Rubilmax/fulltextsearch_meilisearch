@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch_Meilisearch\AppInfo;
 
 use OCA\FullTextSearch_Meilisearch\ConfigLexicon;
+use OCA\FullTextSearch_Meilisearch\Settings\Admin;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -27,6 +28,7 @@ class Application extends App implements IBootstrap {
 
 	public function register(IRegistrationContext $context): void {
 		$context->registerConfigLexicon(ConfigLexicon::class);
+		$context->registerDeclarativeSettings(Admin::class);
 	}
 
 	public function boot(IBootContext $context): void {
