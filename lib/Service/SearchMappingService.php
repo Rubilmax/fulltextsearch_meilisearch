@@ -52,7 +52,7 @@ class SearchMappingService {
 		IDocumentAccess $access,
 		string $providerId
 	): array {
-		$searchString = $request->getSearch();
+		$searchString = self::translateRequiredTerms($request->getSearch());
 		$page = max(1, (int)$request->getPage());
 		$requestedSize = (int)$request->getSize();
 		$size = ($requestedSize > 0) ? $requestedSize : self::DEFAULT_PAGE_SIZE;
@@ -70,6 +70,25 @@ class SearchMappingService {
 		];
 
 		return ['query' => $searchString, 'params' => $params];
+	}
+
+
+	/**
+	 * Nextcloud search queries prefix required terms with "+". Meilisearch treats
+	 * quoted terms as mandatory, while an unquoted plus sign is only punctuation.
+	 */
+	private static function translateRequiredTerms(string $query): string {
+		$translated = preg_replace_callback(
+			'/(^|\s)\+(?:"([^"]+)"|(\S+))/u',
+			static function (array $match): string {
+				$term = ($match[2] ?? '') !== '' ? $match[2] : ($match[3] ?? '');
+
+				return ($match[1] ?? '') . '"' . $term . '"';
+			},
+			$query
+		);
+
+		return is_string($translated) ? $translated : $query;
 	}
 
 

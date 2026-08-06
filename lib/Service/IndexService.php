@@ -12,6 +12,7 @@ namespace OCA\FullTextSearch_Meilisearch\Service;
 use Meilisearch\Client;
 use Meilisearch\Exceptions\ApiException;
 use OCA\FullTextSearch_Meilisearch\Exceptions\AccessIsEmptyException;
+use OCA\FullTextSearch_Meilisearch\Exceptions\ClientException;
 use OCA\FullTextSearch_Meilisearch\Exceptions\ConfigurationException;
 use OCA\FullTextSearch_Meilisearch\Tools\Traits\TArrayTools;
 use OCP\FullTextSearch\Model\IIndex;
@@ -19,6 +20,8 @@ use OCP\FullTextSearch\Model\IIndexDocument;
 use Psr\Log\LoggerInterface;
 
 class IndexService {
+	private const TASK_TIMEOUT_MS = 300000;
+	private const TASK_POLL_INTERVAL_MS = 100;
 
 	use TArrayTools;
 
@@ -174,16 +177,35 @@ class IndexService {
 		return str_replace(['\\', "'"], ['\\\\', "\\'"], $value);
 	}
 
-	private function waitForTaskCompletion(Client $client, array $task): void {
+	/**
+	 * @param array<string, mixed> $task
+	 * @return array<string, mixed>
+	 * @throws ClientException
+	 */
+	private function waitForTaskCompletion(Client $client, array $task): array {
 		if ($task === []) {
-			return;
+			return [];
 		}
 
 		$taskUid = $task['taskUid'] ?? $task['uid'] ?? null;
 		if (!is_scalar($taskUid) || !is_numeric((string)$taskUid)) {
-			return;
+			throw new ClientException('Meilisearch returned a task without a valid uid');
 		}
 
-		$client->waitForTask((int)$taskUid, 30000, 100);
+		$completed = $client->waitForTask(
+			(int)$taskUid,
+			self::TASK_TIMEOUT_MS,
+			self::TASK_POLL_INTERVAL_MS
+		);
+		if (($completed['status'] ?? null) !== 'succeeded') {
+			$error = $completed['error'] ?? null;
+			$message = is_array($error) ? (string)($error['message'] ?? '') : '';
+			throw new ClientException(
+				'Meilisearch task ' . $taskUid . ' did not succeed'
+				. (($message === '') ? '' : ': ' . $message)
+			);
+		}
+
+		return $completed;
 	}
 }

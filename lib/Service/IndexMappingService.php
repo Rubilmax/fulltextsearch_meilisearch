@@ -12,6 +12,7 @@ namespace OCA\FullTextSearch_Meilisearch\Service;
 use Meilisearch\Client;
 use Meilisearch\Exceptions\ApiException;
 use OCA\FullTextSearch_Meilisearch\Exceptions\AccessIsEmptyException;
+use OCA\FullTextSearch_Meilisearch\Exceptions\ClientException;
 use OCA\FullTextSearch_Meilisearch\Exceptions\ConfigurationException;
 use OCP\FullTextSearch\Model\IIndexDocument;
 
@@ -19,6 +20,22 @@ use OCP\FullTextSearch\Model\IIndexDocument;
 class IndexMappingService {
 	private const LEGACY_ID_SEPARATOR = '_-_';
 	private const ESCAPED_ID_PREFIX = 'h_';
+	private const TASK_TIMEOUT_MS = 300000;
+	private const TASK_POLL_INTERVAL_MS = 100;
+	private const REQUIRED_SETTINGS = [
+		'filterableAttributes' => [
+			'owner', 'users', 'groups', 'circles', 'links',
+			'provider', 'metatags', 'subtags', 'tags', 'source',
+			'lastModified',
+		],
+		'searchableAttributes' => [
+			'title', 'content', 'parts',
+		],
+		'sortableAttributes' => [
+			'lastModified',
+		],
+		'displayedAttributes' => ['*'],
+	];
 
 	public function __construct(
 		private ConfigService $configService,
@@ -157,26 +174,12 @@ class IndexMappingService {
 	 */
 	public function configureIndexSettings(Client $client): void {
 		$index = $client->index($this->configService->getMeilisearchIndex());
-
-		$tasks = [];
-		$tasks[] = $index->updateFilterableAttributes([
-			'owner', 'users', 'groups', 'circles', 'links',
-			'provider', 'metatags', 'subtags', 'tags', 'source',
-			'lastModified',
-		]);
-
-		$tasks[] = $index->updateSearchableAttributes([
-			'title', 'content', 'parts',
-		]);
-
-		$tasks[] = $index->updateSortableAttributes([
-			'lastModified',
-		]);
-
-		$tasks[] = $index->updateDisplayedAttributes(['*']);
-		foreach ($tasks as $task) {
-			$this->waitForTaskCompletion($client, $task);
+		$settings = self::getChangedSettings($index->getSettings());
+		if ($settings === []) {
+			return;
 		}
+
+		$this->waitForTaskCompletion($client, $index->updateSettings($settings));
 	}
 
 
@@ -194,7 +197,7 @@ class IndexMappingService {
 		$body = $this->generateIndexBody($document);
 		$body['id'] = self::encodeDocumentId($document->getProviderId(), $document->getId());
 
-		$result = $index->addDocuments([$body]);
+		$result = $this->waitForTaskCompletion($client, $index->addDocuments([$body]));
 
 		return (array) $result;
 	}
@@ -214,7 +217,7 @@ class IndexMappingService {
 		$body = $this->generateIndexBody($document);
 		$body['id'] = self::encodeDocumentId($document->getProviderId(), $document->getId());
 
-		$result = $index->updateDocuments([$body]);
+		$result = $this->waitForTaskCompletion($client, $index->updateDocuments([$body]));
 
 		return (array) $result;
 	}
@@ -233,10 +236,59 @@ class IndexMappingService {
 
 		foreach ($docIds as $docId) {
 			try {
-				$index->deleteDocument($docId);
+				$this->waitForTaskCompletion($client, $index->deleteDocument($docId));
 			} catch (ApiException) {
 			}
 		}
+	}
+
+
+	/**
+	 * Return only settings whose current values differ from the required mapping.
+	 * Keeping initialization idempotent prevents a full reindex on every test or index run.
+	 *
+	 * @param array<string, mixed> $current
+	 * @return array<string, array<int, string>>
+	 */
+	private static function getChangedSettings(array $current): array {
+		$changed = [];
+		foreach (self::REQUIRED_SETTINGS as $name => $required) {
+			$value = $current[$name] ?? null;
+			if (!is_array($value) || array_values($value) !== $required) {
+				$changed[$name] = $required;
+			}
+		}
+
+		return $changed;
+	}
+
+
+	/**
+	 * @param array<string, mixed> $task
+	 * @return array<string, mixed>
+	 * @throws ClientException
+	 */
+	private function waitForTaskCompletion(Client $client, array $task): array {
+		$taskUid = $task['taskUid'] ?? $task['uid'] ?? null;
+		if (!is_scalar($taskUid) || !is_numeric((string)$taskUid)) {
+			throw new ClientException('Meilisearch returned a task without a valid uid');
+		}
+
+		$completed = $client->waitForTask(
+			(int)$taskUid,
+			self::TASK_TIMEOUT_MS,
+			self::TASK_POLL_INTERVAL_MS
+		);
+		if (($completed['status'] ?? null) !== 'succeeded') {
+			$error = $completed['error'] ?? null;
+			$message = is_array($error) ? (string)($error['message'] ?? '') : '';
+			throw new ClientException(
+				'Meilisearch task ' . $taskUid . ' did not succeed'
+				. (($message === '') ? '' : ': ' . $message)
+			);
+		}
+
+		return $completed;
 	}
 
 
@@ -313,16 +365,4 @@ class IndexMappingService {
 		}
 	}
 
-	private function waitForTaskCompletion(Client $client, mixed $task): void {
-		if (!is_array($task)) {
-			return;
-		}
-
-		$taskUid = $task['taskUid'] ?? $task['uid'] ?? null;
-		if (!is_scalar($taskUid) || !is_numeric((string)$taskUid)) {
-			return;
-		}
-
-		$client->waitForTask((int)$taskUid, 30000, 100);
-	}
 }

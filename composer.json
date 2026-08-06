@@ -37,7 +37,7 @@
     "test": [
       "@test:unit"
     ],
-    "test:unit": "./vendor-bin/phpunit/vendor/bin/phpunit -c tests/unit/phpunit.xml",
+    "test:unit": "php tests/unit/run.php",
     "lint": "find . -name \\*.php -not -path './vendor/*' -not -path './vendor-bin/*' -print0 | xargs -0 -n1 php -l"
   },
   "require": {
