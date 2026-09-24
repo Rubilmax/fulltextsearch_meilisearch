@@ -8,6 +8,9 @@ declare(strict_types=1);
  */
 
 use Meilisearch\Client;
+use Meilisearch\Endpoints\Indexes;
+use Meilisearch\Exceptions\ApiException;
+use GuzzleHttp\Psr7\Response;
 use OCA\FullTextSearch_Meilisearch\Exceptions\ClientException;
 use OCA\FullTextSearch_Meilisearch\Service\IndexMappingService;
 use OCA\FullTextSearch_Meilisearch\Service\SearchMappingService;
@@ -45,6 +48,17 @@ final class FakeTaskClient extends Client {
 		return $this->completed;
 	}
 }
+
+final class FakeMissingIndexClient extends Client {
+	public function __construct() {
+	}
+
+	public function getIndex(string $uid): Indexes {
+		throw new ApiException(new Response(404), ['code' => 'index_not_found', 'message' => 'Index not found']);
+	}
+}
+
+assertSameValue(false, IndexMappingService::indexExists(new FakeMissingIndexClient(), 'nextcloud'), 'Missing index must not block first reset');
 
 $translate = new ReflectionMethod(SearchMappingService::class, 'translateRequiredTerms');
 $requiredTermCases = [

@@ -39,12 +39,7 @@ class IndexService {
 	 * @throws ConfigurationException
 	 */
 	public function testIndex(Client $client): bool {
-		try {
-			$client->getIndex($this->indexMappingService->getIndexName());
-			return true;
-		} catch (ApiException) {
-			return false;
-		}
+		return IndexMappingService::indexExists($client, $this->indexMappingService->getIndexName());
 	}
 
 
@@ -80,6 +75,9 @@ class IndexService {
 	 */
 	public function resetIndex(Client $client, string $providerId): void {
 		try {
+			if (!$this->testIndex($client)) {
+				return;
+			}
 			$index = $client->index($this->indexMappingService->getIndexName());
 			$task = $index->deleteDocuments(['filter' => "provider = '" . $this->escapeFilterValue($providerId) . "'"]);
 			$this->waitForTaskCompletion($client, $task);

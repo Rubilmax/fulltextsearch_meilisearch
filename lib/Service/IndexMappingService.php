@@ -165,6 +165,18 @@ class IndexMappingService {
 		return $this->configService->getMeilisearchIndex();
 	}
 
+	public static function indexExists(Client $client, string $name): bool {
+		try {
+			$client->getIndex($name);
+			return true;
+		} catch (ApiException $e) {
+			if ($e->errorCode === 'index_not_found') {
+				return false;
+			}
+			throw $e;
+		}
+	}
+
 
 	/**
 	 * Configure Meilisearch index settings (filterable, searchable, sortable attributes).
@@ -231,7 +243,11 @@ class IndexMappingService {
 	 * @throws ConfigurationException
 	 */
 	public function indexDocumentRemove(Client $client, string $providerId, string $documentId): void {
-		$index = $client->index($this->configService->getMeilisearchIndex());
+		$name = $this->configService->getMeilisearchIndex();
+		if (!self::indexExists($client, $name)) {
+			return;
+		}
+		$index = $client->index($name);
 		$docIds = self::getDocumentIdCandidates($providerId, $documentId);
 
 		foreach ($docIds as $docId) {

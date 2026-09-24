@@ -4,6 +4,12 @@
 -->
 # Changelog
 
+### 35.0.0
+
+- support Nextcloud 35 and validate against its public API
+- skip document deletion and provider reset when the Meilisearch index does not exist yet
+- update bundled Guzzle packages to resolve security advisories
+
 ### 34.0.3
 
 - update every bundled translation for Meilisearch and cover all displayed settings strings
