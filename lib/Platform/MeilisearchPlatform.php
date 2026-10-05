@@ -13,6 +13,7 @@ use Exception;
 use GuzzleHttp\Client as GuzzleClient;
 use Meilisearch\Client;
 use Meilisearch\Exceptions\CommunicationException;
+use OCA\FullTextSearch\Exceptions\PlatformTemporaryException;
 use OCA\FullTextSearch_Meilisearch\ConfigLexicon;
 use OCA\FullTextSearch_Meilisearch\Exceptions\ClientException;
 use OCA\FullTextSearch_Meilisearch\Exceptions\ConfigurationException;
@@ -204,18 +205,7 @@ class MeilisearchPlatform implements IFullTextSearchPlatform {
 	 * @throws Exception
 	 */
 	private function throwPlatformTemporaryException(CommunicationException $e): void {
-		foreach (
-			[
-				'OCA\\FullTextSearch\\Exceptions\\PlatformTemporaryException',
-				'OCP\\FullTextSearch\\Exceptions\\PlatformTemporaryException',
-			] as $exceptionClass
-		) {
-			if (class_exists($exceptionClass) && is_subclass_of($exceptionClass, Exception::class)) {
-				throw new $exceptionClass($e->getMessage(), (int)$e->getCode(), $e);
-			}
-		}
-
-		throw $e;
+		throw new PlatformTemporaryException($e->getMessage(), (int)$e->getCode(), $e);
 	}
 
 
